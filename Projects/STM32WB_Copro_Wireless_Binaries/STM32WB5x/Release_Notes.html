@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Release Notes for STM32WB Copro Wireless Binaries</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="../../../_htmresc/mini-st_2020.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <link rel="icon" type="image/x-icon" href="../../../_htmresc/favicon.png" />
+</head>
+<body>
+<div class="row">
+<div class="col-sm-12 col-lg-4">
+<center>
+<h1 id="release-notes-for">Release Notes for</h1>
+<h1 id="stm32wb-copro-wireless-binaries"><mark>STM32WB Copro Wireless Binaries</mark></h1>
+<p>Copyright © 2023 STMicroelectronics<br />
+</p>
+<a href="https://www.st.com" class="logo"><img src="../../../_htmresc/st_logo_2020.png" alt="ST logo" /></a>
+</center>
+<h1 id="known-limitations">Known Limitations</h1>
+<p><strong>If Anti-Rollback needs to be activated</strong>, please make sure to activate it only after installing the latest FUS version (&gt;= V1.2.0) and after successfully installing a wireless stack (without deleting it). <strong>Otherwise, further wireless stack installation will be blocked.</strong></p>
+<h1 id="purpose">Purpose</h1>
+<p>This release covers the delivery of STM32WB Coprocessor binaries.</p>
+<p>Here is the list of references to user documents:</p>
+<ul>
+<li><a href="http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/dm00513965.pdf">AN5185</a> : ST FW upgrade services for STM32WB</li>
+<li><a href="https://www.st.com/resource/en/user_manual/dm00403500-stm32cubeprogrammer-software-description-stmicroelectronics.pdf">UM2237</a> : STM32CubeProgrammer User Manual</li>
+</ul>
+<p>Here is the list of the supported binaries:</p>
+<ul>
+<li>stm32wb5x_BLE_Thread_ForMatter_fw.bin
+<ul>
+<li>Dynamic Concurrent Mode BLE Thread for Matter (Supports Full BLE Stack 5.2 certified and Minimal Thread Device ready v1.3)</li>
+</ul></li>
+<li>stm32wb5x_Thread_RCP_fw.bin
+<ul>
+<li>Openthread Radio Co-Processor (RCP) with Openthread 1.3</li>
+</ul></li>
+<li>For more details, please refer to: <a href="https://www.st.com/resource/en/application_note/an5289-building-wireless-applications-with-stm32wb-series-microcontrollers-stmicroelectronics.pdf">AN5289</a> : Building wireless applications with STM32WB Series microcontrollers.</li>
+</ul>
+<p><mark>How to flash the Wireless Coprocessor Binary via SWD/JTAG by ST-LINK (STM32CubeProgrammer GUI)</mark></p>
+<ul>
+<li><p><em>Inside the below procedure, the references to binaries name and install address are provided in the section <strong>Main Changes</strong> of this file.</em></p></li>
+<li><p>STEP 1: Use STM32CubeProgrammer GUI</p>
+<ul>
+<li><p>Version 2.7.0 or higher.</p></li>
+<li><p>It gives access to Firmware Upgrade Service (FUS) (<a href="http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/DM00513965.pdf">AN5185</a> : ST firmware upgrade services for STM32WB Series.) through Bootloader.</p></li>
+<li><p>It is currently available as Graphical User Interface (GUI) mode (or Command Line Interface (CLI) mode).</p></li>
+</ul></li>
+<li><p>STEP 2: Access to SWD Interface (system flash)</p>
+<ul>
+<li>For P-NUCLEO-WB55.Nucleo :
+<ul>
+<li>Power ON via ST-LINK and Jumper JP1(USB_STL)</li>
+</ul></li>
+<li>For STM32WB5MM-DK :
+<ul>
+<li>Power ON via ST-LINK and Jumper JP2(USB_STL)</li>
+</ul></li>
+<li>open STM32CubeProgrammer GUI and select “ST-LINK”</li>
+<li>in ST-LINK configuration: (Port: SWD) then select “Connect”</li>
+</ul></li>
+<li><p>STEP 3: select “Start FUS” in Firmware Upgrade Services</p></li>
+<li><p>STEP 4: Read and upgrade FUS Version</p>
+<ul>
+<li>it can been obtained selecting “Read FUS infos”
+<ul>
+<li><em>00050300</em>: FUSv0.5.3 =&gt; <strong>Must be updated using STEP 5.</strong></li>
+<li><em>010X0Y00</em>: FUSv1.<strong>x</strong>.y =&gt; <strong>Must be updated using STEP 6 (when x &lt; 2).</strong></li>
+<li><em>01020000</em>: FUSv1.2.0 =&gt; <strong>Up to date, you can download the new wireless stack using STEP 7.</strong></li>
+</ul></li>
+</ul></li>
+<li><p>STEP 5: Download latest FUS for only FUSv0.5.3 upgrade</p>
+<ul>
+<li>in Firmware Upgrade Services: (File Path: [stm32wb5x_FUS_fw_for_fus_0_5_3.bin], Start Address: [Install@])</li>
+<li>then select “Firmware Upgrade” Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary.</li>
+</ul></li>
+<li><p>STEP 6: Download latest FUS or Safeboot</p>
+<ul>
+<li>in Firmware Upgrade Service: (File Path: [FUS_Binary], Start Address: [Install@])</li>
+<li>then select “Firmware Upgrade” Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary.</li>
+</ul></li>
+<li><p>STEP 7: Download new wireless stack (after “FW Delete” if requested)</p>
+<ul>
+<li>in Firmware Upgrade Service: (File Path: [Wireless_Coprocessor_Binary], Start Address: [Install@])</li>
+<li>then select “Firmware Upgrade” (with “Verify download” and “Start stack after upgrade”) Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary. (<strong>optional</strong>: activate “Anti-Rollback” on downloaded binary) If you need to perform FUS related manipulations, you always need to START the FUS in case the FUS is not running.</li>
+</ul></li>
+<li><p>STEP 8: Revert to default configuration: in Option Bytes menu for User Configuration set: nSWboot0=1 (checked) nboot1=1 nboot0=1</p></li>
+</ul>
+<p><mark>How to flash the Wireless Coprocessor Binary via USB (STM32CubeProgrammer GUI)</mark></p>
+<ul>
+<li><p><em>Inside the below procedure, the references to binaries name and install address are provided in the section <strong>Main Changes</strong> of this file.</em></p></li>
+<li><p>STEP 1: Use STM32CubeProgrammer GUI</p>
+<ul>
+<li><p>Version 2.7.0 or higher.</p></li>
+<li><p>It gives access to Firmware Upgrade Service (FUS) (<a href="http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/DM00513965.pdf">AN5185</a> : ST firmware upgrade services for STM32WB Series.) through Bootloader.</p></li>
+<li><p>It is currently available as Graphical User Interface (GUI) mode (or Command Line Interface (CLI) mode).</p></li>
+</ul></li>
+<li><p>STEP 2: Access to Bootloader USB Interface (system flash)</p>
+<ul>
+<li>Boot mode selected by Boot0 pin set to VDD
+<ul>
+<li>For P-NUCLEO-WB55.Nucleo :
+<ul>
+<li>Jumper between CN7.5(VDD) and CN7.7(Boot0)</li>
+<li>Power ON via USB_USER and Jumper JP1(USB_MCU)</li>
+</ul></li>
+<li>For STM32WB5MM-DK :
+<ul>
+<li>Jumper on CN13(VDD-Boot0) after Pins header soldering</li>
+<li>Power ON via USB_USER and Jumper JP2(USB_MCU)</li>
+</ul></li>
+</ul></li>
+<li><p><strong>Warning</strong>: required Option Byte configuration: [nSWboot0=1]</p></li>
+<li><p>Open STM32CubeProgrammer GUI and select “USB” with (Port: USB1) in USB configuration then select “Connect”</p></li>
+</ul></li>
+<li><p>STEP 3: step bypassed via USB</p></li>
+<li><p>STEP 4: Read and upgrade FUS Version</p>
+<ul>
+<li>it can been obtained selecting “Read FUS infos”
+<ul>
+<li><em>00050300</em>: FUSv0.5.3 =&gt; <strong>Must be updated using STEP 5.</strong></li>
+<li><em>010X0Y00</em>: FUSv1.<strong>x</strong>.y =&gt; <strong>Must be updated using STEP 6 (when x &lt; 2).</strong></li>
+<li><em>01020000</em>: FUSv1.2.0 =&gt; <strong>Up to date, you can download the new wireless stack using STEP 7.</strong></li>
+</ul></li>
+</ul></li>
+<li><p>STEP 5: Download latest FUS for only FUSv0.5.3 upgrade</p>
+<ul>
+<li>in Firmware Upgrade Service: (File Path: [stm32wb5x_FUS_fw_for_fus_0_5_3.bin], Start Address: [Install@])</li>
+<li>then select “Firmware Upgrade” Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary.</li>
+</ul></li>
+<li><p>STEP 6: Download latest FUS or Safeboot</p>
+<ul>
+<li>in Firmware Upgrade Service: (File Path: [FUS_Binary], Start Address: [Install@])</li>
+<li>then select “Firmware Upgrade” Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary.</li>
+</ul></li>
+<li><p>STEP 7: Download new wireless stack (after “FW Delete” if requested)</p>
+<ul>
+<li>in Firmware Upgrade Service: (File Path: [Wireless_Coprocessor_Binary], Start Address: [Install@])</li>
+<li>then select “Firmware Upgrade” (with “Verify download” and “Start stack after upgrade”) Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary.</li>
+</ul></li>
+<li><p>STEP 8: Revert STEP 2 procedure to put back device in normal mode.</p></li>
+</ul>
+<p><mark>How to flash the Wireless Coprocessor Binary via SWD/JTAG by ST-LINK (Command Line Interface)</mark></p>
+<ul>
+<li><p><em>Inside the below procedure, the references to binaries name and install address are provided in the section <strong>Main Changes</strong> of this file.</em></p></li>
+<li><p>STEP 1: Use STM32CubeProgrammer</p>
+<ul>
+<li><p>Version 2.7.0 or higher.</p></li>
+<li><p>It gives access to Firmware Upgrade Service (FUS) (<a href="http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/DM00513965.pdf">AN5185</a> : ST firmware upgrade services for STM32WB Series.) through Bootloader.</p></li>
+<li><p>It is currently available as Command Line Interface (CLI) mode.</p></li>
+</ul></li>
+<li><p>STEP 2: Access to SWD Interface (system flash)</p>
+<ul>
+<li>For P-NUCLEO-WB55.Nucleo :
+<ul>
+<li>Power ON via ST-LINK and Jumper JP1(USB_STL)</li>
+</ul></li>
+<li>For STM32WB5MM-DK :
+<ul>
+<li>Power ON via ST-LINK and Jumper JP2(USB_STL)</li>
+</ul></li>
+</ul></li>
+<li><p>STEP 3: apply “Start FUS”</p>
+<ul>
+<li><em>STM32_Programmer_CLI.exe -c port=swd -startfus</em></li>
+</ul></li>
+<li><p>STEP 4: Read and upgrade FUS Version</p>
+<ul>
+<li><em>STM32_Programmer_CLI.exe -c port=swd mode=UR -r32 0x20030030 1</em>
+<ul>
+<li><em><span class="citation" data-cites="0x20030030">@0x20030030</span>: 00050300</em>: FUSv0.5.3 =&gt; <strong>Must be updated using STEP 5.</strong></li>
+<li><em><span class="citation" data-cites="0x20030030">@0x20030030</span>: 010X0Y00</em>: FUSv1.<strong>x</strong>.y =&gt; <strong>Must be updated using STEP 6 (when x &lt; 2).</strong></li>
+<li><em><span class="citation" data-cites="0x20030030">@0x20030030</span>: 01020X00</em>: FUSv1.2.0 =&gt; <strong>Up to date, you can download the new wireless stack using STEP 7.</strong></li>
+</ul></li>
+<li>Note: when FUS is not running but FUS operator used, you can read FUS version <span class="citation" data-cites="0x20010010">@0x20010010</span></li>
+</ul></li>
+<li><p>STEP 5: Download latest FUS for only FUSv0.5.3 upgrade</p>
+<ul>
+<li><em>STM32_Programmer_CLI.exe -c port=swd mode=UR -fwupgrade stm32wb5x_FUS_fw_for_fus_0_5_3.bin [Install@] firstinstall=0</em></li>
+</ul>
+<p>Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary.</p></li>
+<li><p>STEP 6: Download latest FUS or Safeboot</p>
+<ul>
+<li><em>STM32_Programmer_CLI.exe -c port=swd mode=UR -fwupgrade [FUS_Binary] [Install@] firstinstall=0</em></li>
+</ul>
+<p>Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary.</p></li>
+<li><p>STEP 7: Download new wireless stack</p>
+<ul>
+<li><em>STM32_Programmer_CLI.exe -c port=swd mode=UR -fwupgrade [Wireless_Coprocessor_Binary] [Install@] firstinstall=0</em></li>
+</ul>
+<p>Please check <strong>Wireless Coprocessor Binary Table</strong> for Install@ parameter depending of the binary. (<strong>optional</strong>: activate “Anti-Rollback” on downloaded binary: <em>STM32_Programmer_CLI.exe -c port=swd -antirollback</em>) If you need to perform FUS related manipulations, you always need to START the FUS in case the FUS is not running.</p></li>
+<li><p>STEP 8: Revert to default OB configuration</p>
+<ul>
+<li>*STM32_Programmer_CLI.exe -c port=swd mode=UR -ob nSWboot0=1 nboot1=1 nboot0=1</li>
+</ul></li>
+</ul>
+<p><mark>How to flash the Wireless Coprocessor Binary via USB (Command Line Interface)</mark></p>
+<ul>
+<li><p><em>Inside the below procedure, the references to binaries name and install address are provided in the section <strong>Main Changes</strong> of this file.</em></p></li>
+<li><p>STEP 1: Use STM32CubeProgrammer</p>
+<ul>
+<li><p>Version 2.7 or higher.</p></li>
+<li><p>It gives access to Firmware Upgrade Service (FUS) (<a href="http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/DM00513965.pdf">AN5185</a> : ST firmware upgrade services for STM32WB Series.) through Bootloader.</p></li>
+<li><p>It is currently available as Command Line Interface (CLI) mode.</p></li>
+</ul></li>
+<li><p>STEP 2: Access to Bootloader USB Interface (system flash)</p>
+<ul>
+<li>Boot mode selected by Boot0 pin set to VDD
+<ul>
+<li>For P-NUCLEO-WB55.Nucleo :
+<ul>
+<li>Jumper between CN7.5(VDD) and CN7.7(Boot0)</li>
+<li>Power ON via USB_USER and Jumper JP1(USB_MCU)</li>
+</ul></li>
+<li>For STM32WB5MM-DK :
+<ul>
+<li>Jumper on CN13(VDD-Boot0) after Pins header soldering</li>
+<li>Power ON via USB_USER and Jumper JP2(USB_MCU)</li>
+</ul></li>
+</ul></li>
+<li><strong>Warning</strong>: required Option Byte configuration: [nSWboot0=1]</li>
+</ul></li>
+<li><p>STEP 3: step bypassed via USB</p></li>
+<li><p>STEP 4: Read and upgrade FUS Version</p>
+<ul>
+<li><em>STM32_Programmer_CLI.exe -c port=usb1 -r32 0x20030030 1</em>
+<ul>
+<li><em><span class="citation" data-cites="0x20030030">@0x20030030</span>: 00050300</em>: FUSv0.5.3 =&gt; <strong>Must be updated using STEP 5.</strong></li>
+<li><em><span class="citation" data-cites="0x20030030">@0x20030030</span>: 010X0Y00</em>: FUSv1.<strong>x</strong>.y =&gt; <strong>Must be updated using STEP 6 (when x &lt; 2).</strong></li>
+<li><em><span class="citation" data-cites="0x20030030">@0x20030030</span>: 01020X00</em>: FUSv1.2.0 =&gt; <strong>Up to date, you can download the new wireless stack using STEP 7.</strong></li>
+</ul></li>
+</ul></li>
+<li><p>STEP 5: Download latest FUS for only FUSv0.5.3 upgrade</p>
+<ul>
+<li><em>STM32_Programmer_CLI.exe -c port=usb1 -fwupgrade stm32wb5x_FUS_fw_for_fus_0_5_3.bin [Install@] firstinstall=0</em></li>
+</ul>
+<p>Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary.</p></li>
+<li><p>STEP 6: Download latest FUS or Safeboot</p>
+<ul>
+<li><em>STM32_Programmer_CLI.exe -c port=usb1 -fwupgrade [FUS_Binary] [Install@] firstinstall=0</em> Please check <strong>Firmware Upgrade Services Binary Table</strong> for Install@ parameter depending of the binary.</li>
+</ul></li>
+<li><p>STEP 7: Download new wireless stack</p>
+<ul>
+<li><em>STM32_Programmer_CLI.exe -c port=usb1 -fwupgrade [Wireless_Coprocessor_Binary] [Install@] firstinstall=0</em> Please check <strong>Wireless Coprocessor Binary Table</strong> for Install@ parameter depending of the binary.</li>
+</ul></li>
+<li><p>STEP 8: Revert STEP 2 procedure to put back device in normal mode.</p></li>
+</ul>
+<p><mark>How to compute available flash size </mark></p>
+<ul>
+<li><p>The default linker file is provided in [\Drivers\CMSIS\Device\ST32WBxx\Source\Templates].</p>
+<p>The maximum flash memory that can be used by the application is up to the Secure Flash Start Address (SFSA) that can be read from the option byte.</p>
+<p>The <strong>ICFEDIT_region_ROM_end</strong> in the linker can be modified with a value up to : (0x08000000 + (SFSA &lt;&lt; 12)) - 1.</p></li>
+<li><p><strong>Example</strong>: When the SFSA option byte is set to 0xA0, the maximum value to be used for __ICFEDIT_region_ROM_end is 0x0809FFFF – which is 640KB of flash</p></li>
+<li><p><strong>Note</strong>: The SFSA option byte can only be set by the CPU2. The user cannot modify that value.</p></li>
+</ul>
+</div>
+<div class="col-sm-12 col-lg-8">
+<h1 id="update-history">Update History</h1>
+<div class="collapse">
+<input type="checkbox" id="collapse-section1" checked aria-hidden="true"> <label for="collapse-section1" aria-hidden="false">V1.0.0 / 23-February-2023</label>
+<div>
+<h2 id="main-changes">Main Changes</h2>
+<h1 id="initial-release">Initial Release</h1>
+<p><strong>Associated changes in Wireless Coprocessor Binary</strong>:</p>
+<ul>
+<li>THREAD:
+<ul>
+<li>Thread 1.3 ready</li>
+<li>OT stack updated to SHA-1: 32ac6ddfad2bc196e216c42249c73420542daac0 (July 26th 2022)</li>
+</ul></li>
+</ul>
+<p><strong>Firmware Upgrade Services Binary Table</strong>: Provides Install address for the targeted binary to be used in flash procedure “STEP 5/6” via USB or via SWD/JTAG.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 6%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Wireless Coprocessor Binary</th>
+<th>STM32WB5xxG(1M)</th>
+<th>STM32WB5xxY(640K)</th>
+<th>STM32WB5xxE(512K)</th>
+<th>STM32WB5xxC(256K)</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>stm32wb5x_FUS_fw_for_fus_0_5_3.bin</td>
+<td>0x080<strong>EC</strong>000</td>
+<td>0x080<strong>9A</strong>000</td>
+<td>0x080<strong>7A</strong>000</td>
+<td>0x080<strong>3A</strong>000</td>
+<td>V1.2.0<span class="icon-st-unchanged"></span></td>
+</tr>
+<tr class="even">
+<td>stm32wb5x_FUS_fw.bin</td>
+<td>0x080<strong>EC</strong>000</td>
+<td>0x080<strong>9A</strong>000</td>
+<td>0x080<strong>7A</strong>000</td>
+<td>0x080<strong>3A</strong>000</td>
+<td>V1.2.0<span class="icon-st-unchanged"></span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Wireless Coprocessor Binary Table</strong>: Provides Install address for the targeted binary to be used in flash procedure “STEP 7” via USB or via SWD/JTAG.</p>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 14%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Wireless Coprocessor Binary</th>
+<th>STM32WB5xxG(1M)</th>
+<th>STM32WB5xxY(640k)</th>
+<th>STM32WB5xxE(512K)</th>
+<th>STM32WB5xxC(256K)</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>stm32wb5x_BLE_Thread_ForMatter_fw.bin</td>
+<td>0x080<strong>81</strong>000</td>
+<td>NA</td>
+<td>NA</td>
+<td>NA</td>
+<td>V1.0.0<span class="icon-st-update"></span></td>
+</tr>
+<tr class="even">
+<td>stm32wb5x_Thread_RCP_fw.bin</td>
+<td>0x080<strong>CF</strong>000</td>
+<td>NA</td>
+<td>NA</td>
+<td>NA</td>
+<td>V1.0.0<span class="icon-st-update"></span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Firmware Safeboot Binary Table</strong>: Provides Install address for the targeted binary to be used in flash procedure “STEP 5/6” via USB or via SWD/JTAG.</p>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 15%" />
+<col style="width: 7%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Wireless Coprocessor Binary</th>
+<th>STM32WB5xxG(1M)</th>
+<th>STM32WB5xxY(640k)</th>
+<th>STM32WB5xxE(512K)</th>
+<th>STM32WB5xxC(256K)</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>stm32wb5x_Safeboot_fw.bin</td>
+<td>0x080<strong>F0</strong>000</td>
+<td>0x080<strong>9F</strong>000</td>
+<td>0x080<strong>7F</strong>000</td>
+<td>0x080<strong>3F</strong>000</td>
+<td>V2.0.0<span class="icon-st-unchanged"></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<footer class="sticky">
+<p>For complete documentation on STM32WBxx, visit: [<a href="http://www.st.com/stm32wb">www.st.com/stm32wb</a>]</p>
+<em>This release note uses up to date web standards and, for this reason, should not be opened with Internet Explorer but preferably with popular browsers such as Google Chrome, Mozilla Firefox, Opera or Microsoft Edge.</em>
+</footer>
+</body>
+</html>

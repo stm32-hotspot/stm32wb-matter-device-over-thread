@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Release Notes for STM32WB Matter Device Over Thread Firmware Package</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="_htmresc/mini-st_2020.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <link rel="icon" type="image/x-icon" href="_htmresc/favicon.png" />
+</head>
+<body>
+<div class="row">
+<div class="col-sm-12 col-lg-4">
+<center>
+<h1 id="release-notes-for">Release Notes for</h1>
+<h1 id="STM32WB Matter Device Over Thread"><mark>STM32WB Matter Device Over Thread Examples</mark></h1>
+<p>Copyright © 2023 STMicroelectronics<br />
+</p>
+<a href="https://www.st.com" class="logo"><img src="_htmresc/st_logo_2020.png" alt="ST logo" /></a>
+</center>
+<h1 id="purpose">Purpose</h1>
+<p>STM32WB Matter Device Over Thread example is based on <a href="https://github.com/project-chip/connectedhomeip">Matter</a> and behaves as a Matter accessory communicating
+	over a 802.15.4 Thread network. It can be paired into an existing matter network and can be controlled by this network.	 </p>
+  <p>This example is based on the <a href="https://github.com/STMicroelectronics/STM32CubeWB/releases/tag/v1.15.0">STM32CubeWB_v1.15.0</a> package. For further information about these components, see official package. </p>
+
+</ul></li>
+</ul>
+
+
+<ul>
+</div>
+<div class="col-sm-12 col-lg-8">
+<h1 id="update-history">Update History</h1>
+<div class="collapse">
+<input type="checkbox" id="collapse-section2" checked aria-hidden="true"> <label for="collapse-section2" aria-hidden="true">V1.0.0 RC1 / 24-February-2023</label>
+<div>
+<h2 id="main-changes">Main Changes</h2>
+<h3 id="initial-release-of-STM32WB-Matter-Over-Thread-lightingApp-example"> Release V1.0.0 RC1 (1st Beta release) of <strong>STM32WB Matter Device Over Thread</strong> Example </h3>
+<p>STM32WB Matter Device Over Thread example project is compiled with STM32CubeIDE toolchain gnu 11 and gnu++ 14 tool to initialize the system, peripherals and middleware stacks. STM32CubeIDE.</p>
+<h2 id="components">Components</h2>
+<p>Refer to Release Notes of offical STM32CubeWB v1.15.0 package for details of Components (Drivers, Cortex-M CMSIS, STM32 CMSIS, STMWBxx_HAL_Driver, STM32WBxx_Nucleo, Middlewares, Utilities).
+   The example includes the connectedhomeip SDK from the Connectivity Standard Alliance (CSA)
+</p></ul></li>
+</tr>
+</tbody>
+</table>
+<h2 id="known-limitations">Known Limitations</h2>
+<ul>
+<li> SRP cache on the OpenThread border router needs to be flushed each time a new
+  commissioning process is attempted. For this, factory reset the device by pressing SW1 or B1 for at least 10sec, then do a hardware reset then
+  reset the RCP device or execute in the raspberry terminal ot-ctl srp server disable ; ot-ctl srp server enable, then restart the Android application . After this step, the commissioning process of the device can start; </li>
+<li> Due to some MDNS issues, the commissioning with some Wi-Fi access point may fail. </li>
+<li> Numerous compilation warnings, mostly in the Matter SDK.</li>
+<li> The upstream application build is supported on Windows, MacOS and Linux. However the package itself has only been tested on a Windows 10 host.</li>
+</ul>
+<h2 id="development-toolchains-and-compilers">Development Toolchains and Compilers</h2>
+<ul>
+<li> STM32CubeIDE V1.9.0 gnu 11 and gnu++ 14 toolchain + ST-Link</li>
+</ul>
+<h2 id="supported-devices-and-boards">Supported Devices and Boards</h2>
+<ul>
+STM32WB55xx devices:
+<li><a  href="https://www.st.com/en/evaluation-tools/p-nucleo-wb55.html">P-NUCLEO-WB55  </a>board Rev.D</a></li>
+<li><a href="https://www.st.com/en/evaluation-tools/stm32wb5mm-dk.html">STM32WB5MM-DK </a>board Rev.B</a>  </li>
+</ul>
+<h2 id="dependencies">Dependencies</h2>
+<ul>
+<li>None</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<footer class="sticky">
+<p>For complete documentation on STM32WBxx, visit: [<a href="http://www.st.com/stm32wb">www.st.com/stm32wb</a>]</p>
+<em>This release note uses up to date web standards and, for this reason, should not be opened with Internet Explorer but preferably with popular browsers such as Google Chrome, Mozilla Firefox, Opera or Microsoft Edge.</em>
+</footer>
+</body>
+</html>
