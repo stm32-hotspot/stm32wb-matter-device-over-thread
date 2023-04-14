@@ -23,7 +23,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define MATTER_KEY_NAME_MAX_LENGTH (15 * 2) //AR ADD Max key name string size is 30 "keyType...;KeyName..."
+#define MATTER_KEY_NAME_MAX_LENGTH (15 * 2) // ADD Max key name string size is 30 "keyType...;KeyName..."
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
@@ -31,57 +31,88 @@ namespace PersistedStorage {
  */
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
-CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char *key, void *value, size_t value_size, size_t *read_bytes_size, size_t offset) {
-
+CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char *key, void *value,
+		size_t value_size, size_t *read_bytes_size, size_t offset) {
 	CHIP_ERROR err = CHIP_NO_ERROR;
-#ifdef DEBUG_KMS
-
-	ChipLogDetail( DataManagement, "ST => GET: key =%s",key);
-#endif
 
 	if ((key != NULL) && (value != NULL) && (read_bytes_size != NULL)) {
-		if (!NM_GetKeyValue(value, key, (uint32_t) value_size, read_bytes_size)) {
-#ifdef DEBUG_KMS
-			ChipLogDetail( DataManagement, "ST => Size to read : size =%i",value_size);
-			ChipLogDetail( DataManagement, "ST => RETRUN BUFFER  : size =%i",*read_bytes_size);
-			ChipLogDetail( DataManagement, "ST =>OFFSET  = %i",offset);
-		#endif
-
-		} else {
-#ifdef DEBUG_KMS
-			ChipLogDetail( DataManagement, "ST => KEY NOT FOUND");
-		#endif
-			err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-		}
+		return this->_PrintError(
+				NM_GetKeyValue(value, key, (uint32_t) value_size,
+						read_bytes_size));
+	} else {
+		err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 	}
 	return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char *key) {
-	CHIP_ERROR err = CHIP_NO_ERROR;
 
+	ChipLogDetail( DataManagement, "DELETE=> %s",key);
 	if (key != NULL) {
-		if (NM_DeleteKey(key) != 0) {
-			err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-		}
+		return this->_PrintError(NM_DeleteKey(key));
+
 	}
-	return err;
+	return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
 
-CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char *key, const void *value, size_t value_size) {
-#ifdef DEBUG_KMS
-	ChipLogDetail( DataManagement, "ST => PUT: key =%s",key);
-	ChipLogDetail( DataManagement, "ST => PUT: value =%d \r\n",value_size);
-#endif
-	CHIP_ERROR err = CHIP_NO_ERROR;
+CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char *key, const void *value,
+		size_t value_size) {
 
 	if ((value_size != 0) && (key != NULL) && (value != NULL)) {
-		if (NM_SetKeyValue((char*) value, (char*) key, (uint32_t) value_size) != 0) {
-			err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-			ChipLogDetail( DataManagement, "CHIP_ERROR_PERSISTED_STORAGE_FAILED");
-		}
+
+		return this->_PrintError(
+				NM_SetKeyValue((char*) value, (char*) key,
+						(uint32_t) value_size));
+
 	}
-	return err;
+
+	return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR KeyValueStoreManagerImpl::_PrintError(NVM_StatusTypeDef err) {
+	switch (err) {
+	case NVM_OK:
+		ChipLogDetail(DataManagement, "NVM_OK");
+		return CHIP_NO_ERROR;
+
+	case NVM_KEY_NOT_FOUND:
+		ChipLogDetail(DataManagement, "CHIP_ERROR_PERSISTED_STORAGE_NOT_FOUND");
+		return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+
+	case NVM_WRITE_FAILED:
+		ChipLogDetail(DataManagement, "NVM_WRITE_FAILED");
+		return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+
+	case NVM_READ_FAILED:
+		ChipLogDetail(DataManagement, "NVM_READ_FAILED");
+		return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+
+	case NVM_DELETE_FAILED:
+		ChipLogDetail(DataManagement, "NVM_DELETE_FAILED");
+		return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+
+	case NVM_SIZE_FULL:
+		ChipLogDetail(DataManagement, "NVM_SIZE_FULL");
+		return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+
+	case NVM_BLOCK_SIZE_OVERFLOW:
+		ChipLogDetail(DataManagement, "NVM_BLOCK_SIZE_OVERFLOW");
+		return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+
+	case NVM_ERROR_BLOCK_ALIGN:
+		ChipLogDetail(DataManagement, "NVM_ERROR_BLOCK_ALIGN");
+		return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+
+	case NVM_BUFFER_TOO_SMALL:
+		ChipLogDetail(DataManagement, "NVM_BUFFER_TOO_SMALL");
+		return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+
+	default:
+		ChipLogDetail(DataManagement, "NVM_UNKNOWN_ERROR ");
+		return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+
+	}
+
 }
 
 } // namespace PersistedStorage

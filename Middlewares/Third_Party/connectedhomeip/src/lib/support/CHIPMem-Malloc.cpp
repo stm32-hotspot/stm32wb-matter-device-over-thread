@@ -27,10 +27,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
-//#include <stdlib.h>
-#include "mbedtls/platform.h"
-#include "cmsis_os.h"
-#define USE_FREERTOS
+#include <stdlib.h>
 
 #ifndef NDEBUG
 #include <atomic>
@@ -44,80 +41,6 @@
 
 #if CHIP_CONFIG_MEMORY_MGMT_MALLOC
 
-using namespace std;
-// Define the ‘new’ operator for C++ to use the freeRTOS memory management
-// functions. THIS IS NOT OPTIONAL!
-//
-void* operator new(size_t size) {
-	void *p;
-#ifdef USE_FREERTOS
-if(uxTaskGetNumberOfTasks())
-p=pvPortMalloc(size);
-else
-p=malloc(size);
-
-#else
-	p = malloc(size);
-
-#endif
-#ifdef __EXCEPTIONS
-	if (p == 0) // did pvPortMalloc succeed?
-		throw std::bad_alloc(); // ANSI/ISO compliant behavior
-#endif
-	return p;
-}
-
-//
-// Define the ‘delete’ operator for C++ to use the freeRTOS memory
-// functions. THIS IS NOT OPTIONAL!
-//
-void operator delete(void *p) {
-#ifdef USE_FREERTOS
-if(uxTaskGetNumberOfTasks())
-vPortFree( p );
-else
-free( p );
-#else
-	free(p);
-#endif
-	p = NULL;
-}
-
-void* operator new[](size_t size) {
-	void *p;
-#ifdef USE_FREERTOS
-if(uxTaskGetNumberOfTasks())
-p=pvPortMalloc(size);
-else
-p=malloc(size);
-
-#else
-	p = malloc(size);
-
-#endif
-#ifdef __EXCEPTIONS
-	if (p == 0) // did pvPortMalloc succeed?
-		throw std::bad_alloc(); // ANSI/ISO compliant behavior
-#endif
-	return p;
-}
-
-//
-// Define the ‘delete’ operator for C++ to use the freeRTOS memory
-// functions. THIS IS NOT OPTIONAL!
-//
-void operator delete[](void *p) {
-#ifdef USE_FREERTOS
-if(uxTaskGetNumberOfTasks())
-vPortFree( p );
-else
-free( p );
-#else
-	free(p);
-#endif
-	p = NULL;
-}
-
 namespace chip {
 namespace Platform {
 
@@ -130,16 +53,12 @@ namespace Platform {
 
 #define VERIFY_INITIALIZED() VerifyInitialized(__func__)
 
-
-
 static std::atomic_int memoryInitialized{ 0 };
 
-
-static void   VerifyInitialized(
-		const char *func) {
-	VerifyOrDieWithMsg(memoryInitialized, Support,
-			"ABORT: chip::Platform::%s() called before chip::Platform::MemoryInit()\n",
-			func);
+static void VerifyInitialized(const char * func)
+{
+    VerifyOrDieWithMsg(memoryInitialized, Support, "ABORT: chip::Platform::%s() called before chip::Platform::MemoryInit()\n",
+                       func);
 }
 
 #define VERIFY_POINTER(p)                                                                                                          \
@@ -151,48 +70,54 @@ static void   VerifyInitialized(
 CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
 #ifndef NDEBUG
-	VerifyOrDieWithMsg(memoryInitialized++ == 0, Support,
-			"ABORT: chip::Platform::MemoryInit() called twice.\n");
+    VerifyOrDieWithMsg(memoryInitialized++ == 0, Support, "ABORT: chip::Platform::MemoryInit() called twice.\n");
 #endif
-	return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 void MemoryAllocatorShutdown()
 {
 #ifndef NDEBUG
-	VerifyOrDieWithMsg(--memoryInitialized == 0, Support,
-			"ABORT: chip::Platform::MemoryShutdown() called twice.\n");
+    VerifyOrDieWithMsg(--memoryInitialized == 0, Support, "ABORT: chip::Platform::MemoryShutdown() called twice.\n");
 #endif
 #if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
     dmalloc_shutdown();
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 }
 
-
-void* MemoryAlloc(size_t size) {
-	VERIFY_INITIALIZED();
-	return mbedtls_calloc(1, size);
+void * MemoryAlloc(size_t size)
+{
+    VERIFY_INITIALIZED();
+    return malloc(size);
 }
 
-
-void* MemoryRealloc(void *p, size_t size) {
-	VERIFY_INITIALIZED();
-	VERIFY_POINTER(p);
-	return realloc(p, size);
+void * MemoryCalloc(size_t num, size_t size)
+{
+    VERIFY_INITIALIZED();
+    return calloc(num, size);
 }
 
-void MemoryFree(void *p) {
-	VERIFY_INITIALIZED();
-	VERIFY_POINTER(p);
-	mbedtls_free(p);
+void * MemoryRealloc(void * p, size_t size)
+{
+    VERIFY_INITIALIZED();
+    VERIFY_POINTER(p);
+    return realloc(p, size);
 }
 
-bool MemoryInternalCheckPointer(const void *p, size_t min_size) {
+void MemoryFree(void * p)
+{
+    VERIFY_INITIALIZED();
+    VERIFY_POINTER(p);
+    free(p);
+}
+
+bool MemoryInternalCheckPointer(const void * p, size_t min_size)
+{
 #if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
     return CanCastTo<int>(min_size) && (p != nullptr) &&
         (dmalloc_verify_pnt(__FILE__, __LINE__, __func__, p, 1, static_cast<int>(min_size)) == MALLOC_VERIFY_NOERROR);
 #else  // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
-	return (p != nullptr);
+    return (p != nullptr);
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 }
 

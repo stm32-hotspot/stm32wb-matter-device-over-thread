@@ -390,7 +390,6 @@ int32_t BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef ButtonMode)
 
     (void)HAL_EXTI_GetHandle(&hpb_exti[Button], button_exti_line[Button]);
     (void)HAL_EXTI_RegisterCallback(&hpb_exti[Button],  HAL_EXTI_COMMON_CB_ID, button_callback[Button]);
-
     /* Enable and set Button EXTI Interrupt to the lowest priority */
      HAL_NVIC_SetPriority((BUTTON_IRQn[Button]), button_interrupt_priority[Button], 0x00);
      HAL_NVIC_EnableIRQ((BUTTON_IRQn[Button]));

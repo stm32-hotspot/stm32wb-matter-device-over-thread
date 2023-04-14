@@ -39,6 +39,8 @@ typedef enum
 	NVM_DELETE_FAILED,
 	NVM_SIZE_FULL,
 	NVM_BLOCK_SIZE_OVERFLOW,
+	NVM_ERROR_BLOCK_ALIGN,
+	NVM_FLASH_CORRUPTION,
 	NVM_BUFFER_TOO_SMALL
 }NVM_StatusTypeDef;
 
@@ -55,7 +57,13 @@ void NM_Init (void);
 /**
  * @brief  Copy RAM NVM to Flash
  */
-void NM_Dump(void);
+NVM_StatusTypeDef NM_Dump(void);
+
+/**
+ * @brief  check the nvm if it s corrupted or not
+ * @retval return NVM_OK if nvm is empty or NVM_FLASH_CORRUPTION if it s not empty
+ */
+NVM_StatusTypeDef NM_Check_Validity(void);
 
 
 /**
@@ -97,7 +105,7 @@ NVM_StatusTypeDef NM_DeleteKey(const char* Keyname);
 
 
 void NM_ResetFactory(void);
-
+void NM_FullErase(void);
 
 #ifdef __cplusplus
 }

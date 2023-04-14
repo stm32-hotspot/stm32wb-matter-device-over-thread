@@ -19,6 +19,10 @@
 #ifndef BLE_GAP_ACI_H__
 #define BLE_GAP_ACI_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 #include "ble_types.h"
 
@@ -1822,5 +1826,8 @@ tBleStatus aci_gap_adv_clear_sets( void );
 tBleStatus aci_gap_adv_set_random_address( uint8_t Advertising_Handle,
                                            const uint8_t* Random_Address );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BLE_GAP_ACI_H__ */

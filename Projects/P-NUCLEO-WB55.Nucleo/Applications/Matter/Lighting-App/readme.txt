@@ -23,7 +23,7 @@
 
 STM32WB-Matter-BLE-Thread example is based on Matter and behaves as a Matter accessory communicating over a 802.15.4 Thread network.
 It can be paired into an existing matter network and can be controlled by this network.
-The STM32WB55xx-Nucleo board running Ble_Thread_Dynamic application is capable 
+The STM32WB55xx-Nucleo board running lighting-app application is capable 
 of BLE and OpenThread activity at the same time.
 
 @par Keywords

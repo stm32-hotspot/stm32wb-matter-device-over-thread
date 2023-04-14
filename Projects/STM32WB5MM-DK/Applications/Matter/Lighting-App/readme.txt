@@ -104,8 +104,8 @@ Wireless Coprocessor binary.
 
 
 Minimum requirements for the demo:
-- 1 STM32WB55xx-Nucleo board with Lighting-App firmware.
-- 1 STM32WB55xx-Nucleo board running a Thread RCP connected to a Raspberry pi 4 (recommanded) via FTDI
+- 1 STM32WB5MM-DK board with Lighting-App firmware.
+- 1 STM32WB55xx-Nucleorunning a Thread RCP connected to a Raspberry pi 4 (recommanded) via FTDI
 - 1 Smartphone (Android) with "CHIPTool" Phone Application (available Utilities/APK/app-debug-v_1_0.zip)
 
 

@@ -135,6 +135,7 @@ extern "C" {
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 #define  MBEDTLS_PKCS5_C
 
+#define MBEDTLS_ERROR_C 1
 
 #include "check_crypto_config.h"
 #include "mbedtls/check_config.h"

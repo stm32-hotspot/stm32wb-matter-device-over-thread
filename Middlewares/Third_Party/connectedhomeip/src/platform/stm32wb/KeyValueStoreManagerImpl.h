@@ -44,6 +44,8 @@ public:
 
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
+    CHIP_ERROR _PrintError(NVM_StatusTypeDef err);
+
 
 private:
     // ===== Members for internal use by the following friends.

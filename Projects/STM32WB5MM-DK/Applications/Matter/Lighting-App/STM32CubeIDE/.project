@@ -33,11 +33,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Middlewares/connectedhomeip</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Utilities/stm32_lpm.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Utilities/lpm/tiny_lpm/stm32_lpm.c</locationURI>
@@ -153,11 +148,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_uart_ex.c</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Utilities/LCD/stm32_lcd.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Utilities/LCD/stm32_lcd.c</locationURI>
@@ -221,101 +211,6 @@
 			<name>Middlewares/STM32_WPAN/utilities/stm_queue.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/ST/STM32_WPAN/utilities/stm_queue.c</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/access</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app-common</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/ble</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/cluster</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/controller</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/credentials</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/crypto</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/include</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/inet</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/messaging</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/platform</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/protocols</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/setup_payload</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/system</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/third_party</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/trace</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/transport</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Application/User/Core/src/AppTask.cpp</name>
@@ -491,11 +386,6 @@
 			<name>Middlewares/connectedhomeip/src/access/SubjectDescriptor.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/access/SubjectDescriptor.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/access/examples</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/app/AppBuildConfig.h</name>
@@ -763,11 +653,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/InteractionModelTimeout.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/app/MessageDef</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/app/OTAUserConsentCommon.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/OTAUserConsentCommon.h</locationURI>
@@ -893,39 +778,9 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/chip-zcl-zpro-codec.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/data-model</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/app/message-reader.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/message-reader.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/reporting</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/util</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app-common/zap-generated</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/ble/BLEEndPoint.cpp</name>
@@ -1021,11 +876,6 @@
 			<name>Middlewares/connectedhomeip/src/ble/CHIPBleServiceData.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/ble/CHIPBleServiceData.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/cluster/lighting-app</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/controller/CHIPCluster.h</name>
@@ -1188,16 +1038,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/credentials/TestOnlyLocalCertificateAuthority.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/credentials/attestation_verifier</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/credentials/examples</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/crypto/CHIPCryptoPAL.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/crypto/CHIPCryptoPAL.cpp</locationURI>
@@ -1241,11 +1081,6 @@
 			<name>Middlewares/connectedhomeip/src/crypto/RandUtils.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/crypto/RandUtils.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/include/platform</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/inet/EndPointBasis.h</name>
@@ -1393,31 +1228,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/inet/arpa-inet-compatibility.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/lib/address_resolve</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/asn1</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/core</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/dnssd</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/support</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/messaging/ApplicationExchangeDispatch.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/messaging/ApplicationExchangeDispatch.cpp</locationURI>
@@ -1426,11 +1236,6 @@
 			<name>Middlewares/connectedhomeip/src/messaging/ApplicationExchangeDispatch.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/messaging/ApplicationExchangeDispatch.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/messaging/BUILD.gn</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/messaging/BUILD.gn</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/messaging/EphemeralExchangeDispatch.h</name>
@@ -1568,11 +1373,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/platform/Entropy.cpp</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/platform/FreeRTOS</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/platform/GeneralUtils.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/platform/GeneralUtils.cpp</locationURI>
@@ -1586,11 +1386,6 @@
 			<name>Middlewares/connectedhomeip/src/platform/LockTracker.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/platform/LockTracker.cpp</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/platform/OpenThread</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/platform/PersistedStorage.cpp</name>
@@ -1608,16 +1403,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/platform/SingletonConfigurationManager.cpp</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/platform/logging</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/platform/stm32wb</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/protocols/Protocols.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/protocols/Protocols.cpp</locationURI>
@@ -1626,31 +1411,6 @@
 			<name>Middlewares/connectedhomeip/src/protocols/Protocols.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/protocols/Protocols.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/protocols/bdx</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/protocols/echo</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/protocols/interaction_model</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/protocols/secure_channel</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/protocols/user_directed_commissioning</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/setup_payload/AdditionalDataPayload.h</name>
@@ -1701,6 +1461,11 @@
 			<name>Middlewares/connectedhomeip/src/setup_payload/Base38Encode.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/setup_payload/Base38Encode.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/setup_payload/CHIPAdditionalDataPayloadBuildConfig.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/setup_payload/CHIPAdditionalDataPayloadBuildConfig.h</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/setup_payload/ManualSetupPayloadGenerator.cpp</name>
@@ -1928,21 +1693,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/system/WakeEvent.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/third_party/mbedtls</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/third_party/nlassert</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/third_party/nlio</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/trace/trace.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/trace/trace.cpp</locationURI>
@@ -2111,16 +1861,6 @@
 			<name>Middlewares/connectedhomeip/src/transport/UnauthenticatedSessionTable.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/transport/UnauthenticatedSessionTable.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/transport/raw</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/transport/retransmit</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/FreeRTOS/Source/portable/MemMang/heap_4.c</name>
@@ -2663,131 +2403,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/MessageDef/WriteResponseMessage.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/access-control-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/administrator-commissioning-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/basic</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/color-control-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/descriptor</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/diagnostic-logs-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/fixed-label-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/general-commissioning-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/general-diagnostics-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/group-key-mgmt-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/groups-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/identify-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/level-control</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/localization-configuration-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/network-commissioning</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/occupancy-sensor-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/on-off-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/operational-credentials-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/ota-provider</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/ota-requestor</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/software-diagnostics-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/switch-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/thread-network-diagnostics-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/time-format-localization-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app/clusters/user-label-server</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/app/data-model/BasicTypes.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/data-model/BasicTypes.h</locationURI>
@@ -3138,19 +2753,9 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app-common/zap-generated/attribute-type.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/app-common/zap-generated/attributes</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/app-common/zap-generated/callback.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app-common/zap-generated/callback.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/app-common/zap-generated/callbacks</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/app-common/zap-generated/cluster-enums-check.h</name>
@@ -3188,19 +2793,19 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app-common/zap-generated/enums.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/app-common/zap-generated/ids</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/app-common/zap-generated/print-cluster.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app-common/zap-generated/print-cluster.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/cluster/lighting-app/zap-generated</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
+			<name>Middlewares/connectedhomeip/src/config/standalone/CHIPProjectConfig.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/config/standalone/CHIPProjectConfig.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/config/standalone/SystemProjectConfig.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/config/standalone/SystemProjectConfig.h</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.cpp</name>
@@ -3413,11 +3018,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/include/platform/ThreadStackManager.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/include/platform/internal</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/lib/address_resolve/AddressResolve.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/address_resolve/AddressResolve.cpp</locationURI>
@@ -3466,6 +3066,11 @@
 			<name>Middlewares/connectedhomeip/src/lib/asn1/ASN1OID.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/asn1/ASN1OID.cpp</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/lib/asn1/ASN1OID.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/asn1/ASN1OID.h</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/lib/asn1/ASN1Reader.cpp</name>
@@ -3688,11 +3293,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/dnssd/Advertiser_ImplMinimalMdnsAllocator.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/lib/dnssd/BUILD.gn</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/dnssd/BUILD.gn</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/lib/dnssd/Constants.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/dnssd/Constants.h</locationURI>
@@ -3736,11 +3336,6 @@
 			<name>Middlewares/connectedhomeip/src/lib/dnssd/TxtFields.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/dnssd/TxtFields.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/dnssd/platform</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/lib/support/Base64.cpp</name>
@@ -4158,21 +3753,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/support/ZclString.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/lib/support/logging</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/support/pw_log_chip</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/support/verhoeff</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp</locationURI>
@@ -4233,11 +3813,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/platform/logging/LogV.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/platform/logging/impl</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/platform/stm32wb/BLEManagerImpl.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/platform/stm32wb/BLEManagerImpl.cpp</locationURI>
@@ -4256,6 +3831,11 @@
 			<name>Middlewares/connectedhomeip/src/platform/stm32wb/CHIPDevicePlatformEvent.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/platform/stm32wb/CHIPDevicePlatformEvent.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/platform/stm32wb/CHIPMem-Platform.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/platform/stm32wb/CHIPMem-Platform.cpp</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/platform/stm32wb/CHIPPlatformConfig.h</name>
@@ -4603,9 +4183,9 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/protocols/user_directed_commissioning/UserDirectedCommissioningServer.cpp</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/mbedtls-config.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/mbedtls-config.h</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/third_party/nlassert/nlassert-internal.h</name>
@@ -4626,11 +4206,6 @@
 			<name>Middlewares/connectedhomeip/src/third_party/nlassert/nlassert.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/nlassert/nlassert.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/third_party/nlassert/stdc</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/third_party/nlio/nlbyteorder-big.h</name>
@@ -4716,11 +4291,6 @@
 			<name>Middlewares/connectedhomeip/src/transport/raw/BLE.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/transport/raw/BLE.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/transport/raw/BUILD.gn</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/transport/raw/BUILD.gn</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/transport/raw/Base.h</name>
@@ -4998,6 +4568,11 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.h</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/connectedhomeip/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/connectedhomeip/src/app/clusters/fixed-label-server/fixed-label-server.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/clusters/fixed-label-server/fixed-label-server.cpp</locationURI>
@@ -5268,6 +4843,11 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/clusters/user-label-server/user-label-server.cpp</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/connectedhomeip/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/connectedhomeip/src/app-common/zap-generated/attributes/Accessors.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/app-common/zap-generated/attributes/Accessors.cpp</locationURI>
@@ -5463,11 +5043,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/lib/dnssd/platform/Dnssd.h</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/dnssd/platform/Dnssd.h</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/lib/support/logging/CHIPLogging.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/support/logging/CHIPLogging.cpp</locationURI>
@@ -5481,16 +5056,6 @@
 			<name>Middlewares/connectedhomeip/src/lib/support/logging/Constants.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/support/logging/Constants.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/support/pw_log_chip/public</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/support/pw_log_chip/public_overrides</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/lib/support/verhoeff/Verhoeff.cpp</name>
@@ -5523,29 +5088,9 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/support/verhoeff/Verhoeff36.cpp</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/platform/logging/impl/stdio</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/third_party/nlassert/stdc/assert.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/nlassert/stdc/assert.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/support/pw_log_chip/public/pw_log_chip</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/lib/support/pw_log_chip/public_overrides/pw_log_backend</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/platform/logging/impl/stdio/Logging.cpp</name>
@@ -5768,6 +5313,11 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/memory_buffer_alloc.c</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/memory_buffer_alloc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/memory_buffer_alloc.h</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/net_sockets.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/net_sockets.c</locationURI>
@@ -5843,9 +5393,89 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/poly1305.c</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_core.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_core.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_driver_wrappers.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_driver_wrappers.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_driver_wrappers.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_driver_wrappers.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_invasive.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_invasive.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_its.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_its.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_se.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_se.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_se.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_se.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_service_integration.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_service_integration.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_slot_management.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_slot_management.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_slot_management.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_slot_management.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_storage.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_storage.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_storage.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_crypto_storage.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa_its_file.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa_its_file.c</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/ripemd160.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/ripemd160.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/rsa.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/rsa.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/rsa_internal.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/rsa_internal.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/sha1.c</name>
@@ -5856,6 +5486,11 @@
 			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/sha256.c</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/sha256.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/sha512.c</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/sha512.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/ssl_cache.c</name>
@@ -5986,6 +5621,71 @@
 			<name>Middlewares/connectedhomeip/src/lib/support/pw_log_chip/public_overrides/pw_log_backend/log_backend.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/lib/support/pw_log_chip/public_overrides/pw_log_backend/log_backend.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_accel_driver.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_accel_driver.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_compat.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_compat.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_config.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_config.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_driver_common.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_driver_common.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_entropy_driver.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_entropy_driver.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_extra.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_extra.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_platform.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_platform.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_se_driver.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_se_driver.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_sizes.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_sizes.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_struct.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_struct.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_types.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_types.h</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_values.h</name>
+			<type>1</type>
+			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/third_party/mbedtls/repo/library/psa/crypto_values.h</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>

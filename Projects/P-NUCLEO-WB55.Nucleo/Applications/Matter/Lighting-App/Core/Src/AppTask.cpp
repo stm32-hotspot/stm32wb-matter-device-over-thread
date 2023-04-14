@@ -85,6 +85,7 @@ APP_PRIORITY };
 static bool sIsThreadProvisioned = false;
 static bool sIsThreadEnabled = false;
 static bool sHaveBLEConnections = false;
+static bool sFabricCreated = false;
 static uint8_t NvmTimerCpt = 0;
 static uint8_t NvmButtonStateCpt = 0;
 
@@ -112,14 +113,15 @@ void UnlockOpenThreadTask(void) {
 CHIP_ERROR AppTask::Init() {
 
 	CHIP_ERROR err = CHIP_NO_ERROR;
-	ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+	ChipLogProgress(NotSpecified, "Current Software Version: %s",
+			CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
 	// Setup button handler
 	APP_ENTRY_PBSetReceiveCallback(ButtonEventHandler);
 
 	// Create FreeRTOS sw timer for Push button timeouts.
-	sPushButtonTimeoutTimer = xTimerCreate("PushButtonTimer",       // Just a text name, not used by the RTOS kernel
-			pdMS_TO_TICKS(NVM_TIMEOUT),                   // == default timer period (mS)
+	sPushButtonTimeoutTimer = xTimerCreate("PushButtonTimer", // Just a text name, not used by the RTOS kernel
+			pdMS_TO_TICKS(NVM_TIMEOUT),          // == default timer period (mS)
 			true,               // no timer reload (==one-shot)
 			(void*) this,       // init timer id
 			TimerEventHandler // timer callback handler
@@ -134,7 +136,8 @@ CHIP_ERROR AppTask::Init() {
 
 	ThreadStackMgr().InitThreadStack();
 
-	ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+	ConnectivityMgr().SetThreadDeviceType(
+			ConnectivityManager::kThreadDeviceType_Router);
 
 	PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
@@ -153,14 +156,17 @@ CHIP_ERROR AppTask::Init() {
 	// Init ZCL Data Model
 	static chip::CommonCaseDeviceServerInitParams initParams;
 	(void) initParams.InitializeStaticResourcesBeforeServerInit();
-	chip::DeviceLayer::SetCommissionableDataProvider(&gTestOnlyCommissionableDataProvider);
-	gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+	chip::DeviceLayer::SetCommissionableDataProvider(
+			&gTestOnlyCommissionableDataProvider);
+	gExampleDeviceInfoProvider.SetStorageDelegate(
+			initParams.persistentStorageDelegate);
 	chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
 	chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
 	nativeParams.lockCb = LockOpenThreadTask;
 	nativeParams.unlockCb = UnlockOpenThreadTask;
-	nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+	nativeParams.openThreadInstancePtr =
+			chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
 	initParams.endpointNativeParams = static_cast<void*>(&nativeParams);
 	chip::Server::GetInstance().Init(initParams);
 
@@ -168,7 +174,9 @@ CHIP_ERROR AppTask::Init() {
 	// Open commissioning after boot if no fabric was available
 	if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0) {
 
-		PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+		PrintOnboardingCodes(
+				chip::RendezvousInformationFlags(
+						chip::RendezvousInformationFlag::kBLE));
 		// Enable BLE advertisements
 		chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
 		APP_DBG("BLE advertising started. Waiting for Pairing.");
@@ -176,10 +184,13 @@ CHIP_ERROR AppTask::Init() {
 		uint8_t datasetBytes[Thread::kSizeOperationalDataset];
 		size_t datasetLength = 0;
 		APP_BLE_Init_Dyn_3();
-		CHIP_ERROR error = KeyValueStoreMgr().Get(STM32ThreadDataSet, datasetBytes, sizeof(datasetBytes), &datasetLength);
+		CHIP_ERROR error = KeyValueStoreMgr().Get(STM32ThreadDataSet,
+				datasetBytes, sizeof(datasetBytes), &datasetLength);
+		APP_DBG("Fabric found, join thread network");
 		if (error == CHIP_NO_ERROR) {
 			DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-			deviceDelegate.ProvisionThread(ByteSpan(datasetBytes, datasetLength));
+			deviceDelegate.ProvisionThread(
+					ByteSpan(datasetBytes, datasetLength));
 		} else {
 			APP_DBG("Thread network Data set was not found");
 		}
@@ -209,7 +220,8 @@ void AppTask::AppTaskMain(void *pvParameter) {
 	APP_DBG("App Task started");
 	while (true) {
 
-		BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+		BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event,
+				pdMS_TO_TICKS(10));
 		while (eventReceived == pdTRUE) {
 			sAppTask.DispatchEvent(&event);
 			eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
@@ -232,7 +244,8 @@ void AppTask::LightingActionEventHandler(AppEvent *aEvent) {
 		sAppTask.mSyncClusterToButtonAction = true;
 		LightingMgr().InitiateAction(action, 0, 0, 0);
 	}
-	if (aEvent->Type == AppEvent::kEventType_Level && aEvent->ButtonEvent.Action != 0) {
+	if (aEvent->Type == AppEvent::kEventType_Level
+			&& aEvent->ButtonEvent.Action != 0) {
 		// Toggle Dimming of light between 2 fixed levels
 		uint8_t val = 0x0;
 		val = LightingMgr().GetLevel() == 0x7f ? 0x1 : 0x7f;
@@ -324,7 +337,8 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction) {
 void AppTask::PostEvent(const AppEvent *aEvent) {
 	if (sAppEventQueue != NULL) {
 		if (!xQueueSend(sAppEventQueue, aEvent, 1)) {
-			ChipLogError(NotSpecified, "Failed to post event to app task event queue");
+			ChipLogError(NotSpecified,
+					"Failed to post event to app task event queue");
 		}
 	} else {
 		ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
@@ -335,7 +349,8 @@ void AppTask::DispatchEvent(AppEvent *aEvent) {
 	if (aEvent->Handler) {
 		aEvent->Handler(aEvent);
 	} else {
-		ChipLogError(NotSpecified, "Event received with no handler. Dropping event.");
+		ChipLogError(NotSpecified,
+				"Event received with no handler. Dropping event.");
 	}
 }
 
@@ -345,13 +360,15 @@ void AppTask::DispatchEvent(AppEvent *aEvent) {
 void AppTask::UpdateClusterState(void) {
 	ChipLogProgress(NotSpecified, "UpdateClusterState");
 	// Write the new on/off value
-	EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(STM32_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
+	EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(
+	STM32_LIGHT_ENDPOINT_ID, LightingMgr().IsTurnedOn());
 	if (status != EMBER_ZCL_STATUS_SUCCESS) {
 		ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
 	}
 
 	// Write new level value
-	status = Clusters::LevelControl::Attributes::CurrentLevel::Set(STM32_LIGHT_ENDPOINT_ID, LightingMgr().GetLevel());
+	status = Clusters::LevelControl::Attributes::CurrentLevel::Set(
+	STM32_LIGHT_ENDPOINT_ID, LightingMgr().GetLevel());
 	if (status != EMBER_ZCL_STATUS_SUCCESS) {
 		ChipLogError(NotSpecified, "ERR: updating level %x", status);
 	}
@@ -379,16 +396,22 @@ void AppTask::UpdateLEDs(void) {
 }
 
 void AppTask::UpdateNvmEventHandler(AppEvent *aEvent) {
+	uint8_t err = 0;
 
 	if (sAppTask.mFunction == kFunction_SaveNvm) {
 		if (sIsThreadProvisioned && sIsThreadEnabled) {
 			chip::Thread::OperationalDataset dataset { };
 			DeviceLayer::ThreadStackMgrImpl().GetThreadProvision(dataset);
 			ByteSpan datasetbyte = dataset.AsByteSpan();
-			KeyValueStoreMgr().Put(STM32ThreadDataSet, datasetbyte.data(), datasetbyte.size());
+			KeyValueStoreMgr().Put(STM32ThreadDataSet, datasetbyte.data(),
+					datasetbyte.size());
 		}
-		APP_DBG("SAVE NVM");
-		NM_Dump();
+		err = NM_Dump();
+		if (err == 0) {
+			APP_DBG("SAVE NVM");
+		} else {
+			APP_DBG("Failed to SAVE NVM");
+		}
 
 	} else if (sAppTask.mFunction == kFunction_FactoryReset) {
 		APP_DBG("FACTORY RESET");
@@ -399,13 +422,15 @@ void AppTask::UpdateNvmEventHandler(AppEvent *aEvent) {
 void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t) {
 	switch (event->Type) {
 	case DeviceEventType::kServiceProvisioningChange: {
-		sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+		sIsThreadProvisioned =
+				event->ServiceProvisioningChange.IsServiceProvisioned;
 		UpdateLEDs();
 		break;
 	}
 
 	case DeviceEventType::kThreadConnectivityChange: {
-		sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+		sIsThreadEnabled = (event->ThreadConnectivityChange.Result
+				== kConnectivity_Established);
 		UpdateLEDs();
 		break;
 	}
@@ -419,11 +444,15 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t) {
 	case DeviceEventType::kCHIPoBLEConnectionClosed: {
 		sHaveBLEConnections = false;
 		UpdateLEDs();
+		if (sFabricCreated) {
+			APP_DBG("Start timer to save nvm after commissioning finish");
+			xTimerStart(DelayNvmTimer, 0);
+		}
 		break;
 	}
 
 	case DeviceEventType::kCommissioningComplete: {
-		xTimerStart(DelayNvmTimer, 0);
+		sFabricCreated = true;
 		break;
 	}
 

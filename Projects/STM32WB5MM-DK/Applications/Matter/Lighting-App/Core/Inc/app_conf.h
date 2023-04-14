@@ -602,7 +602,7 @@ typedef enum
  * max buffer Size to queue data traces and max data trace allowed.
  * Only Used if DBG_TRACE_USE_CIRCULAR_QUEUE is defined
  */
-#define DBG_TRACE_MSG_QUEUE_SIZE (1024 * 7)
+#define DBG_TRACE_MSG_QUEUE_SIZE (1024 * 5)
 #define MAX_DBG_TRACE_MSG_SIZE 1024
 
 /******************************************************************************

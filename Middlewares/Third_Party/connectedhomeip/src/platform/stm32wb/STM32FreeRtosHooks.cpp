@@ -25,7 +25,7 @@
     #include MBEDTLS_CONFIG_FILE
 #endif
 
-#define MBEDTLS_HEAP_SIZE 10000
+#define MBEDTLS_HEAP_SIZE 15000
 #include "mbedtls/platform.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/sha1.h"
