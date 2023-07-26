@@ -152,7 +152,7 @@
 									<listOptionValue builtIn="false" value="../../../../../../../Drivers/STM32WBxx_HAL_Driver/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../../../../Drivers/STM32WBxx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="${MATTER}/third_party/mbedtls/repo/library"/>
-									<listOptionValue builtIn="false" value="${MATTER}/cluster/Lighting-app"/>
+									<listOptionValue builtIn="false" value="${MATTER}/cluster/lighting-app"/>
 									<listOptionValue builtIn="false" value="${MATTER}/inet"/>
 									<listOptionValue builtIn="false" value="${MATTER}/platform/stm32wb"/>
 									<listOptionValue builtIn="false" value="${MATTER}/platform"/>
