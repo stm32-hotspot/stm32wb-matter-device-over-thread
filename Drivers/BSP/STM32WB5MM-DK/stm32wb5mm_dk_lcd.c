@@ -64,7 +64,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32wb5mm_dk_lcd.h"
 #include "stm32wb5mm_dk_bus.h"
-#include "ssd1315.h"
 
 /** @addtogroup BSP
   * @{

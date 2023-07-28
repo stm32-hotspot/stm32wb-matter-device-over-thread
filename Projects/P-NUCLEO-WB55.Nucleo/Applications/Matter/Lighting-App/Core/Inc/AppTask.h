@@ -41,7 +41,7 @@ public:
 	    void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
 	    void PostEvent(const AppEvent * event);
 	    void UpdateClusterState();
-	    void InitMatter(void);
+	    CHIP_ERROR InitMatter(void);
 	    static void ButtonEventHandler(Push_Button_st *Button);
 
 protected:

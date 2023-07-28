@@ -30,6 +30,7 @@
 #include "app_conf.h"
 #include "stm32_lpm.h"
 #include "cmsis_os.h"
+#include "queue.h"
 
 /* Private includes -----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -43,15 +44,10 @@
 
 /* Private defines -----------------------------------------------------------*/
 #define C_SIZE_CMD_STRING       256U
-#define C_PANID                 0x2221
-#define C_CHANNEL_NB            14U
+#define MO_NOTIF_QUEUE_SIZE 10
 
 /* USER CODE BEGIN PD */
-#define C_RESSOURCE                     "light"
 
-#define COAP_SEND_TIMEOUT               (1*1000*1000/CFG_TS_TICK_VAL) /**< 1s */
-#define THREAD_CHANGE_MODE_TIMEOUT      (1*1000*1000/CFG_TS_TICK_VAL) /**< 1s */
-#define THREAD_LINK_POLL_PERIOD         (5*1000*1000/CFG_TS_TICK_VAL) /**< 5s */
 /* USER CODE END PD */
 
 static osSemaphoreId_t TransferToM0Semaphore;
@@ -59,23 +55,22 @@ static osMutexId_t MtxThreadId;
 
 /* FreeRtos stacks attributes */
 const osThreadAttr_t ThreadMsgM0ToM4Process_attr = { .name =
-		CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME, .attr_bits =
-		CFG_THREAD_MSG_M0_TO_M4_PROCESS_ATTR_BITS, .cb_mem =
-		CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_MEM, .cb_size =
-		CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_SIZE, .stack_mem =
-		CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_MEM, .priority =
-		CFG_THREAD_MSG_M0_TO_M4_PROCESS_PRIORITY, .stack_size =
-		CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_SIZE };
+CFG_THREAD_MSG_M0_TO_M4_PROCESS_NAME, .attr_bits =
+CFG_THREAD_MSG_M0_TO_M4_PROCESS_ATTR_BITS, .cb_mem =
+CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_MEM, .cb_size =
+CFG_THREAD_MSG_M0_TO_M4_PROCESS_CB_SIZE, .stack_mem =
+CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_MEM, .priority =
+CFG_THREAD_MSG_M0_TO_M4_PROCESS_PRIORITY, .stack_size =
+CFG_THREAD_MSG_M0_TO_M4_PROCESS_STACK_SIZE };
 
 const osThreadAttr_t ThreadCliProcess_attr = { .name =
-		CFG_THREAD_CLI_PROCESS_NAME, .attr_bits =
-		CFG_THREAD_CLI_PROCESS_ATTR_BITS, .cb_mem =
-		CFG_THREAD_CLI_PROCESS_CB_MEM,
-		.cb_size = CFG_THREAD_CLI_PROCESS_CB_SIZE, .stack_mem =
-				CFG_THREAD_CLI_PROCESS_STACK_MEM, .priority =
-				CFG_THREAD_CLI_PROCESS_PRIORITY, .stack_size =
-				CFG_THREAD_CLI_PROCESS_STACK_SIZE };
-
+CFG_THREAD_CLI_PROCESS_NAME, .attr_bits =
+CFG_THREAD_CLI_PROCESS_ATTR_BITS, .cb_mem =
+CFG_THREAD_CLI_PROCESS_CB_MEM, .cb_size = CFG_THREAD_CLI_PROCESS_CB_SIZE,
+		.stack_mem =
+		CFG_THREAD_CLI_PROCESS_STACK_MEM, .priority =
+		CFG_THREAD_CLI_PROCESS_PRIORITY, .stack_size =
+		CFG_THREAD_CLI_PROCESS_STACK_SIZE };
 
 static volatile int FlagReceiveAckFromM0 = 0;
 /* Private macros ------------------------------------------------------------*/
@@ -85,7 +80,6 @@ static volatile int FlagReceiveAckFromM0 = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 static void APP_THREAD_CheckWirelessFirmwareInfo(void);
-static void APP_THREAD_StateNotif(uint32_t NotifFlags, void *pContext);
 static void APP_THREAD_TraceError(const char *pMess, uint32_t ErrCode);
 #if (CFG_FULL_LOW_POWER == 0)
 static void Send_CLI_To_M0(void);
@@ -96,6 +90,7 @@ static void Wait_Getting_Ack_From_M0(void);
 static void Receive_Ack_From_M0(void);
 static void Receive_Notification_From_M0(void);
 static void APP_THREAD_FreeRTOSProcessMsgM0ToM4Task(void *argument);
+static void Ot_Cmd_Transfer_Common(void);
 #if (CFG_FULL_LOW_POWER == 0)
 static void APP_THREAD_FreeRTOSSendCLIToM0Task(void *argument);
 #endif /* (CFG_FULL_LOW_POWER == 0) */
@@ -104,8 +99,6 @@ static void RxCpltCallback(void);
 #endif /* (CFG_FULL_LOW_POWER == 0) */
 
 /* USER CODE BEGIN PFP */
-static void APP_THREAD_CoapRequestHandler(void *pContext, otMessage *pMessage,
-		const otMessageInfo *pMessageInfo);
 /* USER CODE END PFP */
 
 /* Private variables ---------------------------------------------------------*/
@@ -121,7 +114,6 @@ static __IO uint16_t CptReceiveCmdFromUser = 0;
 
 static TL_CmdPacket_t *p_thread_otcmdbuffer;
 static TL_EvtPacket_t *p_thread_notif_M0_to_M4;
-static __IO uint32_t CptReceiveMsgFromM0 = 0;
 PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_TH_Config_t ThreadConfigBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadOtCmdBuffer;
 PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static uint8_t ThreadNotifRspEvtBuffer[sizeof(TL_PacketHeader_t)
@@ -131,15 +123,12 @@ PLACE_IN_SECTION("MB_MEM2") ALIGN(4) static TL_CmdPacket_t ThreadCliNotBuffer;
 extern uint8_t g_ot_notification_allowed;
 
 /* USER CODE BEGIN PV */
-static otCoapResource OT_Ressource = { C_RESSOURCE,
-		APP_THREAD_CoapRequestHandler, "myCtx", NULL };
-static uint8_t OT_ReceivedCommand = 0;
+static QueueHandle_t MoNotifQueue;
 static osThreadId_t OsTaskMsgM0ToM4Id; /* Task managing the M0 to M4 messaging        */
 #if (CFG_FULL_LOW_POWER == 0)
 static osThreadId_t OsTaskCliId; /* Task used to manage CLI command             */
 #endif /* (CFG_FULL_LOW_POWER == 0) */
 /* Debug */
-static uint32_t DebugRxCoapCpt = 0;
 /* USER CODE END PV */
 
 /* Functions Definition ------------------------------------------------------*/
@@ -179,9 +168,14 @@ void APP_THREAD_Init(void) {
 	/* Initialize the mutex */
 	MtxThreadId = osMutexNew( NULL);
 
+	MoNotifQueue = xQueueCreate(MO_NOTIF_QUEUE_SIZE, sizeof(uint8_t));
+	if (MoNotifQueue == NULL) {
+		APP_DBG("Failed to allocate M0 notification queue");
+	}
+
 	/* Create the different FreeRTOS tasks requested to run this Thread application*/
 	OsTaskMsgM0ToM4Id = osThreadNew(APP_THREAD_FreeRTOSProcessMsgM0ToM4Task,
-			NULL, &ThreadMsgM0ToM4Process_attr);
+	NULL, &ThreadMsgM0ToM4Process_attr);
 
 	/* USER CODE BEGIN APP_THREAD_INIT_FREERTOS */
 	/* USER CODE END APP_THREAD_INIT_FREERTOS */
@@ -189,23 +183,6 @@ void APP_THREAD_Init(void) {
 	/* USER CODE END APP_THREAD_INIT_2 */
 }
 
-
-void APP_THREAD_SEND_MSG(void) {
-	//osThreadFlagsSet(OsTaskSendCoapMsgId,4);
-}
-void APP_THREAD_Stop(void) {
-	otError error;
-	/* STOP THREAD */
-	error = otThreadSetEnabled(NULL, false);
-	if (error != OT_ERROR_NONE) {
-		APP_THREAD_Error(ERR_THREAD_STOP, error);
-	}
-}
-
-void APP_THREAD_CleanCallbacks(void) {
-	otRemoveStateChangeCallback(NULL, APP_THREAD_StateNotif, NULL);
-	otCoapRemoveResource(NULL, &OT_Ressource);
-}
 
 /**
  * @brief  Trace the error or the warning reported.
@@ -277,242 +254,36 @@ void APP_THREAD_Error(uint32_t ErrId, uint32_t ErrCode) {
 	}
 }
 
-/*************************************************************
- *
- * LOCAL FUNCTIONS
- *
- *************************************************************/
-
 /**
- * @brief Thread notification when the state changes.
- * @param  aFlags  : Define the item that has been modified
- *         aContext: Context
- *
- * @retval None
- */
-static void APP_THREAD_StateNotif(uint32_t NotifFlags, void *pContext) {
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(pContext);
-
-	/* USER CODE BEGIN APP_THREAD_STATENOTIF */
-
-	/* USER CODE END APP_THREAD_STATENOTIF */
-
-	if ((NotifFlags & (uint32_t) OT_CHANGED_THREAD_ROLE)
-			== (uint32_t) OT_CHANGED_THREAD_ROLE) {
-		switch (otThreadGetDeviceRole(NULL)) {
-		case OT_DEVICE_ROLE_DISABLED:
-			/* USER CODE BEGIN OT_DEVICE_ROLE_DISABLED */
-			APP_DBG_MSG(
-					"\r\n M4: SET CFG_Evt_ThreadStop in Thread_Change_Notification \r\n\n");
-			APP_DBG("THREAD: Disabled")
-			;
-			// APP_ENTRY_Stop_Release_Sem();
-			/* USER CODE END OT_DEVICE_ROLE_DISABLED */
-			break;
-		case OT_DEVICE_ROLE_DETACHED:
-			/* USER CODE BEGIN OT_DEVICE_ROLE_DETACHED */
-			/* USER CODE END OT_DEVICE_ROLE_DETACHED */
-			break;
-		case OT_DEVICE_ROLE_CHILD:
-			/* USER CODE BEGIN OT_DEVICE_ROLE_CHILD */
-			/* USER CODE END OT_DEVICE_ROLE_CHILD */
-			break;
-		case OT_DEVICE_ROLE_ROUTER:
-			/* USER CODE BEGIN OT_DEVICE_ROLE_ROUTER */
-			/* USER CODE END OT_DEVICE_ROLE_ROUTER */
-			break;
-		case OT_DEVICE_ROLE_LEADER:
-			/* USER CODE BEGIN OT_DEVICE_ROLE_LEADER */
-			/* USER CODE END OT_DEVICE_ROLE_LEADER */
-			break;
-		default:
-			/* USER CODE BEGIN DEFAULT */
-			/* USER CODE END DEFAULT */
-			break;
-		}
-	}
-}
-
-/**
- * @brief  Warn the user that an error has occurred.In this case,
- *         the LEDs on the Board will start blinking.
- *
- * @param  pMess  : Message associated to the error.
- * @param  ErrCode: Error code associated to the module (OpenThread or other module if any)
- * @retval None
- */
-static void APP_THREAD_TraceError(const char *pMess, uint32_t ErrCode) {
-	/* USER CODE BEGIN TRACE_ERROR */
-	APP_DBG("**** Fatal error = %s (Err = %d)", pMess, ErrCode);
-	while (1U == 1U) {
-		BSP_LED_Toggle(LED1);
-		HAL_Delay(500U);
-		BSP_LED_Toggle(LED2);
-		HAL_Delay(500U);
-		BSP_LED_Toggle(LED3);
-		HAL_Delay(500U);
-	}
-	/* USER CODE END TRACE_ERROR */
-}
-
-/**
- * @brief Check if the Coprocessor Wireless Firmware loaded supports Thread
- *        and display associated information
+ * @brief Perform initialization of CLI UART interface.
  * @param  None
  * @retval None
  */
-static void APP_THREAD_CheckWirelessFirmwareInfo(void) {
-	WirelessFwInfo_t wireless_info_instance;
-	WirelessFwInfo_t *p_wireless_info = &wireless_info_instance;
-
-	if (SHCI_GetWirelessFwInfo(p_wireless_info) != SHCI_Success) {
-		APP_THREAD_Error((uint32_t) ERR_THREAD_CHECK_WIRELESS,
-				(uint32_t) ERR_INTERFACE_FATAL);
-	} else {
-		APP_DBG("**********************************************************");
-		APP_DBG("WIRELESS COPROCESSOR FW:");
-		/* Print version */
-		APP_DBG("VERSION ID = %d.%d.%d", p_wireless_info->VersionMajor,
-				p_wireless_info->VersionMinor, p_wireless_info->VersionSub);
-
-		switch (p_wireless_info->StackType) {
-		case INFO_STACK_TYPE_THREAD_FTD:
-			APP_DBG("FW Type : Thread FTD")
-			;
-			break;
-		case INFO_STACK_TYPE_THREAD_MTD:
-			APP_DBG("FW Type : Thread MTD")
-			;
-			break;
-		case INFO_STACK_TYPE_BLE_THREAD_FTD_DYAMIC:
-			APP_DBG("FW Type : Dynamic Concurrent Mode BLE/Thread")
-			;
-			break;
-		case INFO_STACK_TYPE_BLE_THREAD_FOR_MATTER:
-		    APP_DBG("FW Type : Dynamic Concurrent Mode BLE/Thread for Matter ")
-			;
-			break;
-		default:
-			/* No Thread device supported ! */
-			APP_THREAD_Error((uint32_t) ERR_THREAD_CHECK_WIRELESS,
-					(uint32_t) ERR_INTERFACE_FATAL);
-			break;
-		}
-		APP_DBG("**********************************************************");
-	}
-}
-
-/*************************************************************
- *
- * FREERTOS WRAPPER FUNCTIONS
- *
- *************************************************************/
-static void APP_THREAD_FreeRTOSProcessMsgM0ToM4Task(void *argument) {
-	UNUSED(argument);
-	for (;;) {
-		/* USER CODE BEGIN APP_THREAD_FREERTOS_PROCESS_MSG_M0_TO_M4_1 */
-
-		/* USER END END APP_THREAD_FREERTOS_PROCESS_MSG_M0_TO_M4_1 */
-		osThreadFlagsWait(1, osFlagsWaitAll, osWaitForever);
-		APP_THREAD_ProcessMsgM0ToM4();
-		/* USER CODE BEGIN APP_THREAD_FREERTOS_PROCESS_MSG_M0_TO_M4_2 */
-
-		/* USER END END APP_THREAD_FREERTOS_PROCESS_MSG_M0_TO_M4_2 */
-	}
-}
-
+void APP_THREAD_Init_UART_CLI(void) {
 #if (CFG_FULL_LOW_POWER == 0)
-static void APP_THREAD_FreeRTOSSendCLIToM0Task(void *argument) {
-	UNUSED(argument);
-	for (;;) {
-		/* USER CODE BEGIN APP_THREAD_FREERTOS_SEND_CLI_TO_M0_1 */
-
-		/* USER END END APP_THREAD_FREERTOS_SEND_CLI_TO_M0_1 */
-		osThreadFlagsWait(1, osFlagsWaitAll, osWaitForever);
-		Send_CLI_To_M0();
-		/* USER CODE BEGIN APP_THREAD_FREERTOS_SEND_CLI_TO_M0_2 */
-
-		/* USER END END APP_THREAD_FREERTOS_SEND_CLI_TO_M0_2 */
-	}
-}
+	OsTaskCliId = osThreadNew(APP_THREAD_FreeRTOSSendCLIToM0Task, NULL,
+			&ThreadCliProcess_attr);
 #endif /* (CFG_FULL_LOW_POWER == 0) */
 
-/* USER CODE BEGIN FREERTOS_WRAPPER_FUNCTIONS */
-/* USER CODE END FREERTOS_WRAPPER_FUNCTIONS */
-
-/* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
+#if (CFG_FULL_LOW_POWER == 0)
+	HW_UART_Init(CFG_CLI_UART);
+	HW_UART_Receive_IT(CFG_CLI_UART, aRxBuffer, 1, RxCpltCallback);
+#endif /* (CFG_FULL_LOW_POWER == 0) */
+}
 
 /**
- * @brief Handler called when the server receives a COAP request.
- * @param pContext : Context
- * @param pMessage : Message
- * @param pMessageInfo : Message information
+ * @brief Perform initialization of TL for THREAD.
+ * @param  None
  * @retval None
  */
-static void APP_THREAD_CoapRequestHandler(void *pContext, otMessage *pMessage,
-		const otMessageInfo *pMessageInfo) {
-	do {
-		if (otCoapMessageGetType(pMessage) != OT_COAP_TYPE_NON_CONFIRMABLE) {
-			break;
-		}
+void APP_THREAD_TL_THREAD_INIT(void) {
+	ThreadConfigBuffer.p_ThreadOtCmdRspBuffer = (uint8_t*) &ThreadOtCmdBuffer;
+	ThreadConfigBuffer.p_ThreadNotAckBuffer =
+			(uint8_t*) ThreadNotifRspEvtBuffer;
+	ThreadConfigBuffer.p_ThreadCliRspBuffer = (uint8_t*) &ThreadCliCmdBuffer;
+	ThreadConfigBuffer.p_ThreadCliNotBuffer = (uint8_t*) &ThreadCliNotBuffer;
 
-		if (otCoapMessageGetCode(pMessage) != OT_COAP_CODE_PUT) {
-			break;
-		}
-
-		if (otMessageRead(pMessage, otMessageGetOffset(pMessage),
-				&OT_ReceivedCommand, 1U) != 1U) {
-			APP_THREAD_Error(ERR_THREAD_MESSAGE_READ, 0);
-		}
-
-		if (OT_ReceivedCommand == 1U) {
-			//BSP_PWM_LED_Toggle(LED1);
-			APP_DBG("**** Recept COAP nb **** %d ", DebugRxCoapCpt++);
-		}
-
-	} while (false);
-}
-
-
-/* USER CODE END FD_LOCAL_FUNCTIONS */
-
-/*************************************************************
- *
- * WRAP FUNCTIONS
- *
- *************************************************************/
-
-void APP_THREAD_RegisterCmdBuffer(TL_CmdPacket_t *p_buffer) {
-	p_thread_otcmdbuffer = p_buffer;
-}
-
-Thread_OT_Cmd_Request_t* THREAD_Get_OTCmdPayloadBuffer(void) {
-	return (Thread_OT_Cmd_Request_t*) p_thread_otcmdbuffer->cmdserial.cmd.payload;
-}
-
-Thread_OT_Cmd_Request_t* THREAD_Get_OTCmdRspPayloadBuffer(void) {
-	return (Thread_OT_Cmd_Request_t*) ((TL_EvtPacket_t*) p_thread_otcmdbuffer)->evtserial.evt.payload;
-}
-
-Thread_OT_Cmd_Request_t* THREAD_Get_NotificationPayloadBuffer(void) {
-	return (Thread_OT_Cmd_Request_t*) (p_thread_notif_M0_to_M4)->evtserial.evt.payload;
-}
-
-static void Ot_Cmd_Transfer_Common(void) {
-	/* OpenThread OT command cmdcode range 0x280 .. 0x3DF = 352 */
-	p_thread_otcmdbuffer->cmdserial.cmd.cmdcode = 0x280U;
-	/* Size = otCmdBuffer->Size (Number of OT cmd arguments : 1 arg = 32bits so multiply by 4 to get size in bytes)
-	 * + ID (4 bytes) + Size (4 bytes) */
-	uint32_t l_size =
-			((Thread_OT_Cmd_Request_t*) (p_thread_otcmdbuffer->cmdserial.cmd.payload))->Size
-					* 4U + 8U;
-	p_thread_otcmdbuffer->cmdserial.cmd.plen = l_size;
-
-	TL_OT_SendCmd();
-
-	/* Wait completion of cmd */
-	Wait_Getting_Ack_From_M0();
+	TL_THREAD_Init(&ThreadConfigBuffer);
 }
 
 /**
@@ -569,6 +340,26 @@ void TL_THREAD_NotReceived(TL_EvtPacket_t *Notbuffer) {
 }
 
 /**
+ * @brief  This function is called when notification on CLI TL Channel from M0+ is received.
+ *
+ * @param   Notbuffer : a pointer to TL_EvtPacket_t
+ * @return  None
+ */
+void TL_THREAD_CliNotReceived(TL_EvtPacket_t *Notbuffer) {
+	TL_CmdPacket_t *l_CliBuffer = (TL_CmdPacket_t*) Notbuffer;
+	uint8_t l_size = l_CliBuffer->cmdserial.cmd.plen;
+
+	/* WORKAROUND: if string to output is "> " then respond directly to M0 and do not output it */
+	if (strcmp((const char*) l_CliBuffer->cmdserial.cmd.payload, "> ") != 0) {
+		/* Write to CLI UART */
+		HW_UART_Transmit_IT(CFG_CLI_UART, l_CliBuffer->cmdserial.cmd.payload,
+				l_size, HostTxCb);
+	} else {
+		Send_CLI_Ack_For_OT();
+	}
+}
+
+/**
  * @brief  This function is called before sending any ot command to the M0
  *         core. The purpose of this function is to be able to check if
  *         there are no notifications coming from the M0 core which are
@@ -579,6 +370,167 @@ void TL_THREAD_NotReceived(TL_EvtPacket_t *Notbuffer) {
 void Pre_OtCmdProcessing(void) {
 	osMutexAcquire(MtxThreadId, osWaitForever);
 }
+
+void APP_THREAD_RegisterCmdBuffer(TL_CmdPacket_t *p_buffer) {
+	p_thread_otcmdbuffer = p_buffer;
+}
+
+Thread_OT_Cmd_Request_t* THREAD_Get_OTCmdPayloadBuffer(void) {
+	return (Thread_OT_Cmd_Request_t*) p_thread_otcmdbuffer->cmdserial.cmd.payload;
+}
+
+Thread_OT_Cmd_Request_t* THREAD_Get_OTCmdRspPayloadBuffer(void) {
+	return (Thread_OT_Cmd_Request_t*) ((TL_EvtPacket_t*) p_thread_otcmdbuffer)->evtserial.evt.payload;
+}
+
+Thread_OT_Cmd_Request_t* THREAD_Get_NotificationPayloadBuffer(void) {
+	return (Thread_OT_Cmd_Request_t*) (p_thread_notif_M0_to_M4)->evtserial.evt.payload;
+}
+
+/*************************************************************
+ *
+ * LOCAL FUNCTIONS
+ *
+ *************************************************************/
+
+/**
+ * @brief  Warn the user that an error has occurred.In this case,
+ *         the LEDs on the Board will start blinking.
+ *
+ * @param  pMess  : Message associated to the error.
+ * @param  ErrCode: Error code associated to the module (OpenThread or other module if any)
+ * @retval None
+ */
+static void APP_THREAD_TraceError(const char *pMess, uint32_t ErrCode) {
+	/* USER CODE BEGIN TRACE_ERROR */
+	APP_DBG("**** Fatal error = %s (Err = %d)", pMess, ErrCode);
+	while (1U == 1U) {
+		BSP_LED_Toggle(LED1);
+		HAL_Delay(500U);
+		BSP_LED_Toggle(LED2);
+		HAL_Delay(500U);
+		BSP_LED_Toggle(LED3);
+		HAL_Delay(500U);
+	}
+	/* USER CODE END TRACE_ERROR */
+}
+
+/**
+ * @brief Check if the Coprocessor Wireless Firmware loaded supports Thread
+ *        and display associated information
+ * @param  None
+ * @retval None
+ */
+static void APP_THREAD_CheckWirelessFirmwareInfo(void) {
+	WirelessFwInfo_t wireless_info_instance;
+	WirelessFwInfo_t *p_wireless_info = &wireless_info_instance;
+
+	if (SHCI_GetWirelessFwInfo(p_wireless_info) != SHCI_Success) {
+		APP_THREAD_Error((uint32_t) ERR_THREAD_CHECK_WIRELESS,
+				(uint32_t) ERR_INTERFACE_FATAL);
+	} else {
+		APP_DBG("**********************************************************");
+		APP_DBG("WIRELESS COPROCESSOR FW:");
+		/* Print version */
+		APP_DBG("VERSION ID = %d.%d.%d", p_wireless_info->VersionMajor,
+				p_wireless_info->VersionMinor, p_wireless_info->VersionSub);
+
+		switch (p_wireless_info->StackType) {
+		case INFO_STACK_TYPE_THREAD_FTD:
+			APP_DBG("FW Type : Thread FTD")
+			;
+			break;
+		case INFO_STACK_TYPE_THREAD_MTD:
+			APP_DBG("FW Type : Thread MTD")
+			;
+			break;
+		case INFO_STACK_TYPE_BLE_THREAD_FTD_DYAMIC:
+			APP_DBG("FW Type : Dynamic Concurrent Mode BLE/Thread")
+			;
+			break;
+//		case INFO_STACK_TYPE_BLE_THREAD_FOR_MATTER:
+//			APP_DBG("FW Type : Dynamic Concurrent Mode BLE/Thread for Matter ")
+//			;
+//			break;
+		default:
+			/* No Thread device supported ! */
+			APP_THREAD_Error((uint32_t) ERR_THREAD_CHECK_WIRELESS,
+					(uint32_t) ERR_INTERFACE_FATAL);
+			break;
+		}
+		APP_DBG("**********************************************************");
+	}
+}
+
+/*************************************************************
+ *
+ * FREERTOS WRAPPER FUNCTIONS
+ *
+ *************************************************************/
+static void APP_THREAD_FreeRTOSProcessMsgM0ToM4Task(void *argument) {
+	UNUSED(argument);
+	uint8_t NotUsed = 0;
+	for (;;) {
+		/* USER CODE BEGIN APP_THREAD_FREERTOS_PROCESS_MSG_M0_TO_M4_1 */
+
+		/* USER END END APP_THREAD_FREERTOS_PROCESS_MSG_M0_TO_M4_1 */
+		xQueueReceive(MoNotifQueue, &NotUsed, portMAX_DELAY);
+
+		if (uxQueueMessagesWaiting(MoNotifQueue) > 1U) {
+			APP_THREAD_Error(ERR_REC_MULTI_MSG_FROM_M0, 0);
+		} else {
+			OpenThread_CallBack_Processing();
+		}
+		/* USER CODE BEGIN APP_THREAD_FREERTOS_PROCESS_MSG_M0_TO_M4_2 */
+
+		/* USER END END APP_THREAD_FREERTOS_PROCESS_MSG_M0_TO_M4_2 */
+	}
+}
+
+#if (CFG_FULL_LOW_POWER == 0)
+static void APP_THREAD_FreeRTOSSendCLIToM0Task(void *argument) {
+	UNUSED(argument);
+	for (;;) {
+		/* USER CODE BEGIN APP_THREAD_FREERTOS_SEND_CLI_TO_M0_1 */
+
+		/* USER END END APP_THREAD_FREERTOS_SEND_CLI_TO_M0_1 */
+		osThreadFlagsWait(1, osFlagsWaitAll, osWaitForever);
+		Send_CLI_To_M0();
+		/* USER CODE BEGIN APP_THREAD_FREERTOS_SEND_CLI_TO_M0_2 */
+
+		/* USER END END APP_THREAD_FREERTOS_SEND_CLI_TO_M0_2 */
+	}
+}
+#endif /* (CFG_FULL_LOW_POWER == 0) */
+
+/* USER CODE BEGIN FREERTOS_WRAPPER_FUNCTIONS */
+/* USER CODE END FREERTOS_WRAPPER_FUNCTIONS */
+
+/* USER CODE BEGIN FD_LOCAL_FUNCTIONS */
+
+/* USER CODE END FD_LOCAL_FUNCTIONS */
+
+/*************************************************************
+ *
+ * WRAP FUNCTIONS
+ *
+ *************************************************************/
+static void Ot_Cmd_Transfer_Common(void) {
+	/* OpenThread OT command cmdcode range 0x280 .. 0x3DF = 352 */
+	p_thread_otcmdbuffer->cmdserial.cmd.cmdcode = 0x280U;
+	/* Size = otCmdBuffer->Size (Number of OT cmd arguments : 1 arg = 32bits so multiply by 4 to get size in bytes)
+	 * + ID (4 bytes) + Size (4 bytes) */
+	uint32_t l_size =
+			((Thread_OT_Cmd_Request_t*) (p_thread_otcmdbuffer->cmdserial.cmd.payload))->Size
+					* 4U + 8U;
+	p_thread_otcmdbuffer->cmdserial.cmd.plen = l_size;
+
+	TL_OT_SendCmd();
+
+	/* Wait completion of cmd */
+	Wait_Getting_Ack_From_M0();
+}
+
 
 /**
  * @brief  This function waits for getting an acknowledgment from the M0.
@@ -613,8 +565,20 @@ static void Receive_Ack_From_M0(void) {
  * @retval None
  */
 static void Receive_Notification_From_M0(void) {
-	CptReceiveMsgFromM0++;
-	osThreadFlagsSet(OsTaskMsgM0ToM4Id, 1);
+	/* The xHigherPriorityTaskWoken parameter must be initialized to pdFALSE as
+	 it will get set to pdTRUE inside the interrupt safe API function if a
+	 context switch is required. */
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+	uint8_t NotUsed = 0;
+	xQueueSendToFrontFromISR(MoNotifQueue, &NotUsed, &xHigherPriorityTaskWoken);
+
+	/* Pass the xHigherPriorityTaskWoken value into portEND_SWITCHING_ISR(). If
+	 xHigherPriorityTaskWoken was set to pdTRUE inside xSemaphoreGiveFromISR()
+	 then calling portEND_SWITCHING_ISR() will request a context switch. If
+	 xHigherPriorityTaskWoken is still pdFALSE then calling
+	 portEND_SWITCHING_ISR() will have no effect */
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 #if (CFG_FULL_LOW_POWER == 0)
@@ -668,57 +632,6 @@ static void Send_CLI_Ack_For_OT(void) {
 	TL_THREAD_CliSendAck();
 }
 
-/**
- * @brief Perform initialization of CLI UART interface.
- * @param  None
- * @retval None
- */
-void APP_THREAD_Init_UART_CLI(void) {
-#if (CFG_FULL_LOW_POWER == 0)
-	OsTaskCliId = osThreadNew(APP_THREAD_FreeRTOSSendCLIToM0Task, NULL,
-			&ThreadCliProcess_attr);
-#endif /* (CFG_FULL_LOW_POWER == 0) */
-
-#if (CFG_FULL_LOW_POWER == 0)
-	HW_UART_Init(CFG_CLI_UART);
-	HW_UART_Receive_IT(CFG_CLI_UART, aRxBuffer, 1, RxCpltCallback);
-#endif /* (CFG_FULL_LOW_POWER == 0) */
-}
-
-/**
- * @brief Perform initialization of TL for THREAD.
- * @param  None
- * @retval None
- */
-void APP_THREAD_TL_THREAD_INIT(void) {
-	ThreadConfigBuffer.p_ThreadOtCmdRspBuffer = (uint8_t*) &ThreadOtCmdBuffer;
-	ThreadConfigBuffer.p_ThreadNotAckBuffer =
-			(uint8_t*) ThreadNotifRspEvtBuffer;
-	ThreadConfigBuffer.p_ThreadCliRspBuffer = (uint8_t*) &ThreadCliCmdBuffer;
-	ThreadConfigBuffer.p_ThreadCliNotBuffer = (uint8_t*) &ThreadCliNotBuffer;
-
-	TL_THREAD_Init(&ThreadConfigBuffer);
-}
-
-/**
- * @brief  This function is called when notification on CLI TL Channel from M0+ is received.
- *
- * @param   Notbuffer : a pointer to TL_EvtPacket_t
- * @return  None
- */
-void TL_THREAD_CliNotReceived(TL_EvtPacket_t *Notbuffer) {
-	TL_CmdPacket_t *l_CliBuffer = (TL_CmdPacket_t*) Notbuffer;
-	uint8_t l_size = l_CliBuffer->cmdserial.cmd.plen;
-
-	/* WORKAROUND: if string to output is "> " then respond directly to M0 and do not output it */
-	if (strcmp((const char*) l_CliBuffer->cmdserial.cmd.payload, "> ") != 0) {
-		/* Write to CLI UART */
-		HW_UART_Transmit_IT(CFG_CLI_UART, l_CliBuffer->cmdserial.cmd.payload,
-				l_size, HostTxCb);
-	} else {
-		Send_CLI_Ack_For_OT();
-	}
-}
 
 /**
  * @brief  End of transfer callback for CLI UART sending.
@@ -726,26 +639,8 @@ void TL_THREAD_CliNotReceived(TL_EvtPacket_t *Notbuffer) {
  * @param   Notbuffer : a pointer to TL_EvtPacket_t
  * @return  None
  */
-void HostTxCb(void) {
+static void HostTxCb(void) {
 	Send_CLI_Ack_For_OT();
-}
-
-/**
- * @brief Process the messages coming from the M0.
- * @param  None
- * @retval None
- */
-void APP_THREAD_ProcessMsgM0ToM4(void) {
-	if (CptReceiveMsgFromM0 != 0) {
-		/* If CptReceiveMsgFromM0 is > 1. it means that we did not serve all the events from the radio */
-		if (CptReceiveMsgFromM0 > 1U) {
-			APP_THREAD_Error(ERR_REC_MULTI_MSG_FROM_M0, 0);
-		} else {
-			OpenThread_CallBack_Processing();
-		}
-		/* Reset counter */
-		CptReceiveMsgFromM0 = 0;
-	}
 }
 
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */

@@ -15,31 +15,11 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 #include "identify-server.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
@@ -48,6 +28,7 @@
 
 #include <app/util/af.h>
 #include <app/util/common.h>
+#include <app/util/error-mapping.h>
 #include <array>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -63,6 +44,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
+using chip::Protocols::InteractionModel::Status;
 
 static Identify * firstIdentify = nullptr;
 
@@ -223,9 +205,9 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const a
     auto & identifyTime = commandData.identifyTime;
 
     // cmd Identify
-    return EMBER_SUCCESS ==
-        emberAfSendImmediateDefaultResponse(
-               Clusters::Identify::Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime));
+    commandObj->AddStatus(commandPath,
+                          ToInteractionModelStatus(Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime)));
+    return true;
 }
 
 bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -259,7 +241,7 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
         identify->mOnEffectIdentifier(identify);
     }
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 

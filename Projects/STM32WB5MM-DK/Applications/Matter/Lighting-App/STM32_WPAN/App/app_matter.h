@@ -92,11 +92,10 @@ typedef void (*BLEDAckCallback)(uint16_t *connid);
 /* USER CODE END EM */
 
 /* Exported functions ---------------------------------------------*/
-void APP_MATTER_Init(void);
 /* USER CODE BEGIN EF */
-void APP_MATTER_SW1_Button_Action(void);
+void APP_MATTER_Init(void);
 void APP_MATTER_Send_Notification(uint16_t datalength, uint8_t *data);
-void MATTER_APP_Notification(MATTER_App_Notification_evt_t *pNotification);
+void APP_MATTER_Notification(MATTER_App_Notification_evt_t *pNotification);
 
 void APP_MATTER_BLE_Set_Connection_Callback(BLEConnectionCallback aCallback);
 void APP_MATTER_BLE_Set_Disconnection_Callback(BLEDisconnectionCallback aCallback);

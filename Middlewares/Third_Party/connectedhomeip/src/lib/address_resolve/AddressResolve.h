@@ -142,7 +142,7 @@ public:
 
 private:
     static constexpr uint32_t kMinLookupTimeMsDefault = 200;
-    static constexpr uint32_t kMaxLookupTimeMsDefault = 15000;
+    static constexpr uint32_t kMaxLookupTimeMsDefault = 45000;
 
     PeerId mPeerId;
     System::Clock::Milliseconds32 mMinLookupTimeMs{ kMinLookupTimeMsDefault };
@@ -204,6 +204,32 @@ public:
     ///     in progress)
     virtual CHIP_ERROR LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle) = 0;
 
+    /// Inform the Lookup handle that the previous node lookup was not
+    /// sufficient for the purpose of the caller (e.g establishing a session
+    /// fails with the result of the previous lookup), and that more data is
+    /// needed.
+    ///
+    /// This method must be called on a handle that is no longer active to
+    /// succeed.
+    ///
+    /// If the handle is no longer active and has results that have not been
+    /// delivered to the listener yet, the listener's OnNodeAddressResolved will
+    /// be called synchronously before the method returns.  Note that depending
+    /// on the listener implementation this can end up destroying the handle
+    /// and/or the listener.
+    ///
+    /// This method will return CHIP_NO_ERROR if and only if it has called
+    /// OnNodeAddressResolved.
+    ///
+    /// This method will return CHIP_ERROR_INCORRECT_STATE if the handle is
+    /// still active.
+    ///
+    /// This method will return CHIP_ERROR_WELL_EMPTY if there are no more
+    /// results.
+    ///
+    /// This method may return other errors in some cases.
+    virtual CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) = 0;
+
     /// Stops an active lookup request.
     ///
     /// Caller controlls weather the `fail` callback of the handle is invoked or not by using
@@ -232,7 +258,7 @@ public:
 //   - define the `Impl::NodeLookupHandle` deriving from NodeLookupHandleBase
 //   - corresponding CPP file should provide a valid Resolver::Instance()
 //     implementation
-#include <lib/address_resolve/AddressResolve_DefaultImpl.h>
+#include CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER
 
 namespace chip {
 namespace AddressResolve {

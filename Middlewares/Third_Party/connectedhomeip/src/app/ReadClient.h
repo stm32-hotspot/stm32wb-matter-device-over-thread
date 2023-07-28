@@ -38,7 +38,7 @@
 #include <app/data-model/Decode.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -234,6 +234,21 @@ public:
             aEventNumber.ClearValue();
             return CHIP_NO_ERROR;
         }
+
+        /**
+         * OnUnsolicitedMessageFromPublisher will be called for a subscription
+         * ReadClient when any incoming message is received from a matching
+         * node on the fabric.
+         *
+         * This callback will be called:
+         *   - When receiving any unsolicited communication from the node
+         *   - Even for disconnected subscriptions.
+         *
+         * Callee MUST not synchronously destroy ReadClients in this callback.
+         *
+         * @param[in] apReadClient the ReadClient for the subscription.
+         */
+        virtual void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) {}
     };
 
     enum class InteractionType : uint8_t
@@ -287,6 +302,14 @@ public:
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+
+    void OnUnsolicitedMessageFromPublisher()
+    {
+        TriggerResubscribeIfScheduled("unsolicited message");
+
+        // Then notify callbacks
+        mpCallback.OnUnsolicitedMessageFromPublisher(this);
+    }
 
     auto GetSubscriptionId() const
     {
@@ -392,6 +415,26 @@ public:
      */
     void OverrideLivenessTimeout(System::Clock::Timeout aLivenessTimeout);
 
+    /**
+     * If the ReadClient currently has a resubscription attempt scheduled,
+     * trigger that attempt right now.  This is generally useful when a consumer
+     * has some sort of indication that the server side is currently up and
+     * communicating, so right now is a good time to try to resubscribe.
+     *
+     * The reason string is used for logging if a resubscribe is triggered.
+     */
+    void TriggerResubscribeIfScheduled(const char * reason);
+
+    /**
+     * Returns the timeout after which we consider the subscription to have
+     * dropped, if we have received no messages within that amount of time.
+     *
+     * Returns NullOptional if a subscription has not yet been established (and
+     * hence the MaxInterval is not yet known), or if the subscription session
+     * is gone and hence the relevant MRP parameters can no longer be determined.
+     */
+    Optional<System::Clock::Timeout> GetSubscriptionTimeout();
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
@@ -438,6 +481,7 @@ private:
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
     CHIP_ERROR ProcessSubscribeResponse(System::PacketBufferHandle && aPayload);
     CHIP_ERROR RefreshLivenessCheckTimer();
+    CHIP_ERROR ComputeLivenessCheckTimerTimeout(System::Clock::Timeout * aTimeout);
     void CancelLivenessCheckTimer();
     void CancelResubscribeTimer();
     void MoveToState(const ClientState aTargetState);
@@ -480,7 +524,8 @@ private:
     void StopResubscription();
     void ClearActiveSubscriptionState();
 
-    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                      const SessionHandle & sessionHandle);
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
@@ -501,7 +546,8 @@ private:
     InteractionType mInteractionType = InteractionType::Read;
     Timestamp mEventTimestamp;
 
-    bool mDoCaseOnNextResub = true;
+    bool mForceCaseOnNextResub      = true;
+    bool mIsResubscriptionScheduled = false;
 
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

@@ -379,7 +379,7 @@ static void APPE_SysEvtReadyProcessing(void) {
 	APP_BLE_Init_Dyn_2();
 
 	APP_DBG("Start init matter");
-	GetAppTask().InitMatter();
+	GetAppTask().StartAppTask();
 
 #if ( CFG_LPM_SUPPORTED == 1)
   /* Thread stack is initialized, low power mode can be enabled */

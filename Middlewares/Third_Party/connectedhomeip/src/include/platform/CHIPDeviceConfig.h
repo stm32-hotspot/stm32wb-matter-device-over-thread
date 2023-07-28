@@ -79,7 +79,7 @@
  * The priority of the chip task.
  */
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY 1
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY 2
 #endif
 
 /**
@@ -92,15 +92,48 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
+ * CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
  *
- * Compute and log a hash of the device's provisioning data on boot.
- *
- * The generated hash value confirms to the form described in the CHIP: Factory
- * Provisioning Specification.
+ * Enable support for background event processing.
  */
-#ifndef CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 1
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+#define CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BG_TASK_NAME
+ *
+ * The name of the background task.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BG_TASK_NAME
+#define CHIP_DEVICE_CONFIG_BG_TASK_NAME "BG"
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE
+ *
+ * The size (in bytes) of the background task stack.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE
+#define CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE (6 * 1024)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY
+ *
+ * The priority of the background task.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY
+#define CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE
+ *
+ * The maximum number of events that can be held in the chip background event queue.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE
+#define CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE 1
 #endif
 
 /**
@@ -130,6 +163,16 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
 #define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL 200_ms32
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD
+ *
+ *  Minimum amount the node SHOULD stay awake after network activity.
+ * Spec section 2.12.5
+ */
+#ifndef CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD System::Clock::Milliseconds32(4000)
 #endif
 
 // -------------------- Device Identification Configuration --------------------
@@ -181,7 +224,7 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION_STRING
+ * CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING
  *
  * Human readable string identifying version of the product assigned by the device vendor.
  */
@@ -212,7 +255,7 @@
  * A string identifying the software version running on the device.
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "prerelease"
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0"
 #endif
 
 /**
@@ -221,7 +264,7 @@
  * A monothonic number identifying the software version running on the device.
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
 #endif
 
 /**
@@ -558,57 +601,7 @@
  * Defaults to 30000 (30 seconds).
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME
-#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 100*30000
-#endif
-
-// -------------------- Time Sync Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote chip Time service
- * using the chip Time Sync protocol.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_CHIP_TIME_SERVICE_ENDPOINT_ID
- *
- * Specifies the service endpoint id of the chip Time Sync service to be used to synchronize time.
- *
- * This value is only meaningful if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC has
- * been enabled.
- */
-#ifndef CHIP_DEVICE_CONFIG_CHIP_TIME_SERVICE_ENDPOINT_ID
-#define CHIP_DEVICE_CONFIG_CHIP_TIME_SERVICE_ENDPOINT_ID 0x18B4300200000005ULL
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_DEFAULT_TIME_SYNC_INTERVAL
- *
- * Specifies the minimum interval (in seconds) at which the device should synchronize its real time
- * clock with the configured chip Time Sync server.
- *
- * This value is only meaningful if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC has
- * been enabled.
- */
-#ifndef CHIP_DEVICE_CONFIG_DEFAULT_TIME_SYNC_INTERVAL
-#define CHIP_DEVICE_CONFIG_DEFAULT_TIME_SYNC_INTERVAL 180
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_TIME_SYNC_TIMEOUT
- *
- * Specifies the maximum amount of time (in milliseconds) to wait for a response from a
- * chip Time Sync server.
- *
- * This value is only meaningful if CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC has
- * been enabled.
- */
-#ifndef CHIP_DEVICE_CONFIG_TIME_SYNC_TIMEOUT
-#define CHIP_DEVICE_CONFIG_TIME_SYNC_TIMEOUT 10000
+#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
 #endif
 
 // -------------------- Service Provisioning Configuration --------------------
@@ -700,7 +693,7 @@
  * The priority of the OpenThread task.
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY
-#define CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY 2
+#define CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY 3
 #endif
 
 /**
@@ -789,19 +782,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
-#endif
-
-// -------------------- Trait Manager Configuration --------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER
- *
- * Enable or disable the chip Trait Manager.
- *
- * NOTE: The Trait Manager is an experimental feature of the chip Device Layer.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER
-#define CHIP_DEVICE_CONFIG_ENABLE_TRAIT_MANAGER 0
 #endif
 
 // -------------------- Network Telemetry Configuration --------------------
@@ -972,8 +952,12 @@
  * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE
  *
  * @brief
- *   A size, in bytes, of the individual critical event logging buffer.
- *   Note: the critical event buffer must exist.
+ *   A size, in bytes, of the buffer reserved for storing CRITICAL events and no
+ *   other events.  CRITICAL events will never be evicted until this buffer is
+ *   full, so its size and the sizes of events determine how many of the last N
+ *   CRITICAL events are guaranteed to be available.
+ *
+ *   Note: this number must be nonzero.
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE (1024)
@@ -984,27 +968,16 @@
 #endif
 
 /**
- * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_PROD_BUFFER_SIZE
- *
- * @brief
- *   A size, in bytes, of the individual production event logging buffer.
- *   Note: the production event buffer must exist.
- */
-#ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_PROD_BUFFER_SIZE
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_PROD_BUFFER_SIZE (512)
-#endif
-
-#if (CHIP_DEVICE_CONFIG_EVENT_LOGGING_PROD_BUFFER_SIZE <= 0)
-#error "The Prod event buffer must exist (CHIP_DEVICE_CONFIG_EVENT_LOGGING_PROD_BUFFER_SIZE > 0)"
-#endif
-
-/**
  * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE
  *
  * @brief
- *   A size, in bytes, of the individual info event logging buffer.
- *   Note: set to 0 to disable info event buffer and all support
- *   for the info level events.
+ *   A size, in bytes, of the buffer reserved for storing events at INFO
+ *   priority and higher.  INFO-priority events will not be evicted until this
+ *   buffer is full (with INFO and CRITICAL events in it) and the oldest event
+ *   in the buffer is an INFO-priority event (which cannot be evicted into the
+ *   CRITICAL event buffer).
+ *
+ *   Note: set to 0 to treat INFO events as effectively equivalent to DEBUG events.
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE (512)
@@ -1014,9 +987,14 @@
  * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * @brief
- *   A size, in bytes, of the individual debug event logging buffer.
- *   Note: set to 0 to disable debug event buffer and all support
- *   for the debug level events.
+ *   A size, in bytes, of the buffer used for storing newly generated events,
+ *   and the only buffer in which DEBUG-priority events are allowed.
+ *   DEBUG-priority events will start getting evicted when this buffer is full
+ *   (with DEBUG, INFO, and CRITICAL events in it) and the oldest event in the
+ *   buffer is a DEBUG-priority event, which cannot be evicted into the INFO
+ *   event buffer.
+ *
+ *   Note: set to 0 to disable storing DEBUG events.
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
@@ -1030,6 +1008,16 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH
 #define CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH (0x10000)
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+ *
+ * @brief
+ *   By default, don't record UTC timestamps.
+ */
+#ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 0
 #endif
 
 // -------------------- Software Update Manager Configuration --------------------
@@ -1215,6 +1203,18 @@
 #endif
 
 /**
+ * CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
+ *
+ * See issue 23625.
+ *
+ * Needs to be 1 when the following is 1:
+ *  CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+ */
+#ifndef CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
+#define CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
  *
  * Enable or disable whether this device will attempt to
@@ -1350,6 +1350,38 @@
 #define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION ""
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+ *
+ * If 1, enable support for automatic CASE establishment retries.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+#define CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES 1
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+/**
+ * CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS
+ *
+ * The initial retry delay, in seconds, for our automatic CASE retries.
+ */
+#ifndef CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS
+#define CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF
+ *
+ * The maximum number of times we back off, by a factor of 2 each time, from our
+ * initial CASE retry interval before we plateau.
+ */
+#ifndef CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF
+#define CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF 5
+#endif
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
 // -------------------- App Platform Configuration --------------------
 
 /**
@@ -1368,4 +1400,14 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 0
+#endif
+
+/**
+ * CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS
+ *
+ * Time threshold for events dispatching
+ * Set 0 to disable event dispatching time measurement
+ */
+#ifndef CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS
+#define CHIP_DISPATCH_EVENT_LONG_DISPATCH_TIME_WARNING_THRESHOLD_MS 100
 #endif

@@ -213,8 +213,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     reader.Init(std::move(payload));
     ReturnErrorOnFailure(invokeResponseMessage.Init(reader));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(invokeResponseMessage.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    invokeResponseMessage.PrettyPrint();
 #endif
 
     ReturnErrorOnFailure(invokeResponseMessage.GetSuppressResponse(&suppressResponse));
@@ -361,7 +361,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
 
     if (aStartDataStruct)
     {
-        ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)),
+        ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
     }
 

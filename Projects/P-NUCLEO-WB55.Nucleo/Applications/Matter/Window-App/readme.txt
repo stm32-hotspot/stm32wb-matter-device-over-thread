@@ -137,14 +137,16 @@ The Peripheral device (P2P Server) starts a fast advertising after reset for 30 
 After reset, OpenThread is started and nodes tries to build up a Thread network or attach to a existing one
 
 
-**** BUTTON/LED SUMMARY ****
+**** LED SUMMARY ****
 LED Mapping :
 - LED 1 Blue  : ON when the STM32WB55xx-Nucleo board is paired via BLE to an Android Smartphone, OFF otherwise.
 - LED 2 Green : ON when the STM32WB55xx-Nucleo board is connected to a Thread network, OFF otherwise.
 
 
-Button Mapping :
-- SW1 1 : Press the button for at least 10 seconds to do a factory reset
+****  BUTTON SUMMARY ****
+Button Mapping:
+- SW1 1 : Press the button for at least 10 seconds to do a factory reset.
+          Push the button the save the non-volatile memory after unpairing the device then power off the board.
 
 
 Coprocessor firmware:

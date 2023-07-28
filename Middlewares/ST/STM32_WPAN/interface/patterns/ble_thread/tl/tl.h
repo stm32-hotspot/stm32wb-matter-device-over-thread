@@ -58,9 +58,8 @@ extern "C" {
 #define TL_BLEEVT_CS_OPCODE            (0x0F)
 #define TL_BLEEVT_VS_OPCODE            (0xFF)
 
-#define TL_BLEEVT_CS_PACKET_SIZE       (TL_EVT_HDR_SIZE + sizeof(TL_CsEvt_t))
-#define TL_BLEEVT_CS_BUFFER_SIZE       (sizeof(TL_PacketHeader_t) + TL_BLEEVT_CS_PACKET_SIZE)
-
+#define TL_BLEEVT_CC_PACKET_SIZE       (TL_EVT_HDR_SIZE + sizeof(TL_CcEvt_t))
+#define TL_BLEEVT_CC_BUFFER_SIZE       (sizeof(TL_PacketHeader_t) + TL_BLEEVT_CC_PACKET_SIZE)
 /* Exported types ------------------------------------------------------------*/
 /**< Packet header */
 typedef PACKED_STRUCT
@@ -90,7 +89,7 @@ typedef PACKED_STRUCT
 {
   uint8_t   numcmd;
   uint16_t  cmdcode;
-  uint8_t   payload[255];
+  uint8_t   payload[2];
 } TL_CcEvt_t;
 
 /**
@@ -99,7 +98,7 @@ typedef PACKED_STRUCT
 typedef PACKED_STRUCT
 {
   uint16_t  subevtcode;
-  uint8_t   payload[255];
+  uint8_t   payload[2];
 } TL_AsynchEvt_t;
 
 /**
@@ -109,7 +108,7 @@ typedef PACKED_STRUCT
 {
   uint8_t   evtcode;
   uint8_t   plen;
-  uint8_t   payload[255];
+  uint8_t   payload[2];
 } TL_Evt_t;
 
 typedef PACKED_STRUCT
@@ -237,6 +236,43 @@ typedef struct
   void (* IoBusCallBackUserEvt) (TL_EvtPacket_t *phcievt);
   uint8_t *p_cmdbuffer;
 } TL_SYS_InitConf_t;
+
+/*****************************************************************************************
+ * Event type copied from ble_legacy.h 
+ */
+
+typedef PACKED_STRUCT
+{
+  uint8_t type;
+  uint8_t data[1];
+} hci_uart_pckt;
+
+typedef PACKED_STRUCT
+{
+  uint8_t         evt;
+  uint8_t         plen;
+  uint8_t         data[1];
+} hci_event_pckt;
+
+typedef PACKED_STRUCT
+{
+  uint8_t         subevent;
+  uint8_t         data[1];
+} evt_le_meta_event;
+
+/**
+ * Vendor specific event for BLE core.
+ */
+typedef PACKED_STRUCT
+{
+  uint16_t ecode; /**< One of the BLE core event codes. */
+  uint8_t  data[1];
+} evt_blecore_aci;
+
+/* Bluetooth 48 bit address (in little-endian order).
+ */
+typedef	uint8_t	tBDAddr[6];
+
 
 /* Exported constants --------------------------------------------------------*/
 /* External variables --------------------------------------------------------*/

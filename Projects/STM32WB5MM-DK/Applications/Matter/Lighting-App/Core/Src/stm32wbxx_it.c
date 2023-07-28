@@ -27,6 +27,7 @@
 /* External variables  -----------------------------------------------------------*/
 extern uint8_t ThreadEnable;
 extern TIM_HandleTypeDef htim17;
+extern QSPI_HandleTypeDef hqspi;
 
 
 /* /THREAD */
@@ -114,6 +115,21 @@ void DebugMon_Handler(void)
 {
   HAL_IncTick();
 }*/
+
+
+/**
+  * @brief This function handles QUADSPI global interrupt.
+  */
+void QUADSPI_IRQHandler(void)
+{
+  /* USER CODE BEGIN QUADSPI_IRQn 0 */
+
+  /* USER CODE END QUADSPI_IRQn 0 */
+  HAL_QSPI_IRQHandler(&hqspi);
+  /* USER CODE BEGIN QUADSPI_IRQn 1 */
+
+  /* USER CODE END QUADSPI_IRQn 1 */
+}
 
  void IPCC_C1_TX_IRQHandler(void)
 {

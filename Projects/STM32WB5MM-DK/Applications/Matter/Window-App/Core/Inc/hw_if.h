@@ -50,7 +50,7 @@ extern "C" {
 #include "x_nucleo_epd.h"
 #endif
 #ifdef USE_STM32WB5M_DK
-#include ".\..\..\..\Drivers\BSP\STM32WB5MM-DK\stm32wb5mm_dk.h"
+#include "stm32wb5mm_dk.h"
 #endif
 
 /* Private includes ----------------------------------------------------------*/

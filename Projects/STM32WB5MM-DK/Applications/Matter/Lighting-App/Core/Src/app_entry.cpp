@@ -186,13 +186,7 @@ void APPE_Init(void) {
 	return;
 }
 
-void APP_ENTRY_LedBlink(uint8_t LedStatus) {
-	if (LedStatus == 1) {
 
-	} else {
-
-	}
-}
 static void displayConcurrentMode() {
 	APP_DBG("Matter Over Thread Lighting-App starting...");
 }
@@ -379,7 +373,7 @@ static void APPE_SysEvtReadyProcessing(void) {
 	APP_BLE_Init_Dyn_2();
 
 	APP_DBG("Start init matter");
-	GetAppTask().InitMatter();
+	GetAppTask().StartAppTask();
 
 #if ( CFG_LPM_SUPPORTED == 1)
   /* Thread stack is initialized, low power mode can be enabled */
@@ -395,10 +389,6 @@ static void Led_Init(void) {
 	/**
 	 * Leds Initialization
 	 */
-
-	//BSP_LED_Init(LED_BLUE);
-	//BSP_LED_Init(LED_GREEN);
-	//BSP_LED_Init(LED_RED);
 #endif
 
 	return;
@@ -412,8 +402,7 @@ static void Button_Init(void) {
 	 */
 
 	BSP_PB_Init(BUTTON_USER1, BUTTON_MODE_EXTI);
-//  BSP_PB_Init(BUTTON_SW2, BUTTON_MODE_EXTI);
-//  BSP_PB_Init(BUTTON_SW3, BUTTON_MODE_EXTI);
+
 #endif
 
 	return;
@@ -556,10 +545,7 @@ void BSP_PB_Callback(Button_TypeDef Button) {
 		/* Set "Switch Protocol" Task */
 		break;
 
-		//case BUTTON_SW3_PIN:
-		APP_DBG("BUTTON 3 PUSHED !")
-		;
-		break;
+
 
 	default:
 		break;

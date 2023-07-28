@@ -277,6 +277,41 @@ Here is the list of the supported binaries:
 ::: {.col-sm-12 .col-lg-8}
 # Update History
 ::: {.collapse}
+<input type="checkbox" id="collapse-section3" checked aria-hidden="true">
+<label for="collapse-section3" aria-hidden="false">V1.1.1 / 26-July-2023</label>
+<div>
+
+## Main Changes
+- BLE THREAD:
+  - Update Coprocessor binary according to STM32CubeWB firmware release V1.17.0
+
+
+  
+**Firmware Upgrade Services Binary Table**: Provides Install address for the targeted binary to be used in flash procedure "STEP 5/6" via USB or via SWD/JTAG.
+
+| Wireless Coprocessor Binary                | STM32WB5xxG(1M)  | STM32WB5xxY(640K) | STM32WB5xxE(512K) | STM32WB5xxC(256K) | Version  
+| ------------------------------------------ | ---------------  | ---------------   |  ---------------  | ---------------   | -------  
+| stm32wb5x_FUS_fw_for_fus_0_5_3.bin         | 0x080**EC**000   |   0x080**9A**000  | 0x080**7A**000    | 0x080**3A**000    | V1.2.0[]{.icon-st-unchanged}
+| stm32wb5x_FUS_fw.bin                       | 0x080**EC**000   |   0x080**9A**000  | 0x080**7A**000    | 0x080**3A**000    | V1.2.0[]{.icon-st-unchanged}
+
+**Wireless Coprocessor Binary Table**: Provides Install address for the targeted binary to be used in flash procedure "STEP 7" via USB or via SWD/JTAG.
+
+| Wireless Coprocessor Binary                | STM32WB5xxG(1M)  | STM32WB5xxY(640k) | STM32WB5xxE(512K) | STM32WB5xxC(256K) | Version 
+|--------------------------------------------|------------------|-------------------|-------------------|-------------------| -------
+| stm32wb5x_BLE_Thread_ForMatter_fw.bin      | 0x080**85**000   | NA                | NA                | NA                | V1.1.1[]{.icon-st-update}
+| stm32wb5x_Thread_RCP_fw.bin                | 0x080**CF**000   | NA                | NA                | NA                | V1.0.0[]{.icon-st-update}
+
+
+**Firmware Safeboot Binary Table**: Provides Install address for the targeted binary to be used in flash procedure "STEP 5/6" via USB or via SWD/JTAG.
+
+| Wireless Coprocessor Binary    | STM32WB5xxG(1M)  | STM32WB5xxY(640k) | STM32WB5xxE(512K) | STM32WB5xxC(256K) | Version  
+| ------------------------------ | ---------------  | ---------------   |  ---------------  | ---------------   | -------  
+| stm32wb5x_Safeboot_fw.bin      | 0x080**F0**000   |   0x080**9F**000  | 0x080**7F**000    | 0x080**3F**000    | V2.0.0[]{.icon-st-unchanged}
+
+</div>
+:::
+
+::: {.collapse}
 <input type="checkbox" id="collapse-section2" checked aria-hidden="true">
 <label for="collapse-section2" aria-hidden="false">V1.0.1 / 13-April-2023</label>
 <div>
@@ -300,7 +335,7 @@ Here is the list of the supported binaries:
 
 | Wireless Coprocessor Binary                | STM32WB5xxG(1M)  | STM32WB5xxY(640k) | STM32WB5xxE(512K) | STM32WB5xxC(256K) | Version 
 |--------------------------------------------|------------------|-------------------|-------------------|-------------------| -------
-| stm32wb5x_BLE_Thread_ForMatter_fw.bin      | 0x080**81**000   | NA                | NA                | NA                | V1.0.1[]{.icon-st-update}
+| stm32wb5x_BLE_Thread_ForMatter_fw.bin      | 0x080**7F**000   | NA                | NA                | NA                | V1.0.1[]{.icon-st-update}
 | stm32wb5x_Thread_RCP_fw.bin                | 0x080**CF**000   | NA                | NA                | NA                | V1.0.0[]{.icon-st-update}
 
 

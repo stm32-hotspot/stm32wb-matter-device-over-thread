@@ -5,7 +5,7 @@
  ******************************************************************************
  * @attention
  *
- * Copyright (c) 2018-2022 STMicroelectronics.
+ * Copyright (c) 2018-2023 STMicroelectronics.
  * All rights reserved.
  *
  * This software is licensed under terms that can be found in the LICENSE file
@@ -99,37 +99,42 @@
 #define HCI_LE_SUBRATE_CHANGE_SUBEVT_CODE                              0x23U
 
 /* HCI error code */
-#define HCI_SUCCESS_ERR_CODE                                   0x00U
-#define HCI_UNKNOWN_HCI_COMMAND_ERR_CODE                       0x01U
-#define HCI_UNKNOWN_CONNECTION_IDENTIFIER_ERR_CODE             0x02U
-#define HCI_AUTHENTICATION_FAILURE_ERR_CODE                    0x05U
-#define HCI_PIN_OR_KEY_MISSING_ERR_CODE                        0x06U
-#define HCI_MEMORY_CAPACITY_EXCEEDED_ERR_CODE                  0x07U
-#define HCI_CONNECTION_TIMEOUT_ERR_CODE                        0x08U
-#define HCI_CONNECTION_ALREADY_EXISTS_ERR_CODE                 0x0BU
-#define HCI_COMMAND_DISALLOWED_ERR_CODE                        0x0CU
-#define HCI_UNSUPPORTED_FEATURE_OR_PARAMETER_VALUE_ERR_CODE    0x11U
-#define HCI_INVALID_HCI_COMMAND_PARAMETERS_ERR_CODE            0x12U
-#define HCI_REMOTE_USER_TERMINATED_CONNECTION_ERR_CODE         0x13U
-#define HCI_CONNECTION_TERMINATED_BY_LOCAL_HOST_ERR_CODE       0x16U
-#define HCI_LMP_FEATURE_ERR_CODE                               0x1AU
-#define HCI_INVALID_LL_PARAMETERS_ERR_CODE                     0x1EU
-#define HCI_UNSPECIFIED_ERROR_ERR_CODE                         0x1FU
-#define HCI_UNSUPPORTED_LL_PARAMETER_VALUE_ERR_CODE            0x20U
-#define HCI_LL_RESPONSE_TIMEOUT_ERR_CODE                       0x22U
-#define HCI_LL_PROCEDURE_COLLISION_ERR_CODE                    0x23U
-#define HCI_LMP_PDU_NOT_ALLOWED_ERR_CODE                       0x24U
-#define HCI_INSTANT_PASSED_ERR_CODE                            0x28U
-#define HCI_DIFFERENT_TRANSACTION_COLLISION_ERR_CODE           0x2AU
-#define HCI_PARAMETER_OUT_OF_MANDATORY_RANGE_ERR_CODE          0x30U
-#define HCI_HOST_BUSY_PAIRING_ERR_CODE                         0x38U
-#define HCI_CONTROLLER_BUSY_ERR_CODE                           0x3AU
-#define HCI_ADVERTISING_TIMEOUT_ERR_CODE                       0x3CU
-#define HCI_CONNECTION_TERMINATED_DUE_TO_MIC_FAILURE_ERR_CODE  0x3DU
-#define HCI_CONNECTION_FAILED_TO_BE_ESTABLISHED_ERR_CODE       0x3EU
-#define HCI_UNKNOWN_ADVERTISING_IDENTIFIER_ERR_CODE            0x42U
-#define HCI_ADVERTISING_LIMIT_REACHED_ERR_CODE                 0x43U
-#define HCI_PACKET_TOO_LONG_ERR_CODE                           0x45U
+#define HCI_SUCCESS_ERR_CODE                                           0x00U
+#define HCI_UNKNOWN_HCI_COMMAND_ERR_CODE                               0x01U
+#define HCI_UNKNOWN_CONNECTION_IDENTIFIER_ERR_CODE                     0x02U
+#define HCI_HARDWARE_FAILURE_ERR_CODE                                  0x03U
+#define HCI_AUTHENTICATION_FAILURE_ERR_CODE                            0x05U
+#define HCI_PIN_OR_KEY_MISSING_ERR_CODE                                0x06U
+#define HCI_MEMORY_CAPACITY_EXCEEDED_ERR_CODE                          0x07U
+#define HCI_CONNECTION_TIMEOUT_ERR_CODE                                0x08U
+#define HCI_CONNECTION_LIMIT_EXCEEDED_ERR_CODE                         0x09U
+#define HCI_CONNECTION_ALREADY_EXISTS_ERR_CODE                         0x0BU
+#define HCI_COMMAND_DISALLOWED_ERR_CODE                                0x0CU
+#define HCI_UNSUPPORTED_FEATURE_OR_PARAMETER_VALUE_ERR_CODE            0x11U
+#define HCI_INVALID_HCI_COMMAND_PARAMETERS_ERR_CODE                    0x12U
+#define HCI_REMOTE_USER_TERMINATED_CONNECTION_ERR_CODE                 0x13U
+#define HCI_REMOTE_TERMINATED_CONNECTION_DUE_TO_LOW_RESOURCES_ERR_CODE 0x14U
+#define HCI_REMOTE_TERMINATED_CONNECTION_DUE_TO_POWER_OFF_ERR_CODE     0x15U
+#define HCI_CONNECTION_TERMINATED_BY_LOCAL_HOST_ERR_CODE               0x16U
+#define HCI_UNSUPPORTED_REMOTE_FEATURE_ERR_CODE                        0x1AU
+#define HCI_INVALID_LL_PARAMETERS_ERR_CODE                             0x1EU
+#define HCI_UNSPECIFIED_ERROR_ERR_CODE                                 0x1FU
+#define HCI_UNSUPPORTED_LL_PARAMETER_VALUE_ERR_CODE                    0x20U
+#define HCI_LL_RESPONSE_TIMEOUT_ERR_CODE                               0x22U
+#define HCI_LL_PROCEDURE_COLLISION_ERR_CODE                            0x23U
+#define HCI_LMP_PDU_NOT_ALLOWED_ERR_CODE                               0x24U
+#define HCI_INSTANT_PASSED_ERR_CODE                                    0x28U
+#define HCI_DIFFERENT_TRANSACTION_COLLISION_ERR_CODE                   0x2AU
+#define HCI_PARAMETER_OUT_OF_MANDATORY_RANGE_ERR_CODE                  0x30U
+#define HCI_HOST_BUSY_PAIRING_ERR_CODE                                 0x38U
+#define HCI_CONTROLLER_BUSY_ERR_CODE                                   0x3AU
+#define HCI_UNACCEPTABLE_CONNECTION_PARAMETERS_ERR_CODE                0x3BU
+#define HCI_ADVERTISING_TIMEOUT_ERR_CODE                               0x3CU
+#define HCI_CONNECTION_TERMINATED_DUE_TO_MIC_FAILURE_ERR_CODE          0x3DU
+#define HCI_CONNECTION_FAILED_TO_BE_ESTABLISHED_ERR_CODE               0x3EU
+#define HCI_UNKNOWN_ADVERTISING_IDENTIFIER_ERR_CODE                    0x42U
+#define HCI_ADVERTISING_LIMIT_REACHED_ERR_CODE                         0x43U
+#define HCI_PACKET_TOO_LONG_ERR_CODE                                   0x45U
 
 /* HCI_LE_Set_Advertising_Parameters: Advertising_Type */
 #define HCI_ADV_TYPE_ADV_IND                           0x00U
@@ -140,9 +145,9 @@
 
 /* HCI_LE_Set_Advertising_Parameters: Advertising_Filter_Policy */
 #define HCI_ADV_FILTER_NO                              0x00U
-#define HCI_ADV_FILTER_WHITELIST_SCAN                  0x01U
-#define HCI_ADV_FILTER_WHITELIST_CONNECT               0x02U
-#define HCI_ADV_FILTER_WHITELIST_SCAN_CONNECT          0x03U
+#define HCI_ADV_FILTER_ACC_LIST_USED_FOR_SCAN          0x01U
+#define HCI_ADV_FILTER_ACC_LIST_USED_FOR_CONNECT       0x02U
+#define HCI_ADV_FILTER_ACC_LIST_USED_FOR_ALL           0x03U
 
 /* HCI_LE_Set_[Advertising/Scan]_Parameters: Own_Address_Type */
 #define HCI_OWN_ADDR_TYPE_PUBLIC                       0x00U
@@ -156,13 +161,13 @@
 
 /* HCI_LE_Set_Scan_Parameters: Scanning_Filter_Policy */
 #define HCI_SCAN_FILTER_NO                             0x00U
-#define HCI_SCAN_FILTER_WHITELIST                      0x01U
-#define HCI_SCAN_FILTER_NO_EVEN_RPA                    0x02U
-#define HCI_SCAN_FILTER_WHITELIST_BUT_RPA              0x03U
+#define HCI_SCAN_FILTER_ACC_LIST_USED                  0x01U
+#define HCI_SCAN_FILTER_NO_EXT                         0x02U
+#define HCI_SCAN_FILTER_ACC_LIST_USED_EXT              0x03U
 
 /* HCI_LE_Create_Connection: Initiator_Filter_Policy */
 #define HCI_INIT_FILTER_NO                             0x00U
-#define HCI_INIT_FILTER_WHITELIST                      0x01U
+#define HCI_INIT_FILTER_ACC_LIST_USED                  0x01U
 
 /* HCI_LE_Read_PHY: TX_PHY */
 #define HCI_TX_PHY_LE_1M                               0x01U
@@ -235,6 +240,12 @@
 /* HCI_LE_Set_Privacy_Mode: Privacy_Mode */
 #define HCI_PRIV_MODE_NETWORK                          0x00U
 #define HCI_PRIV_MODE_DEVICE                           0x01U
+
+/* Bluetooth Core Specification versions
+ */
+#define BLE_CORE_5_2                     11
+#define BLE_CORE_5_3                     12
+#define BLE_CORE_5_4                     13
 
 
 #endif /* BLE_STD_H__ */

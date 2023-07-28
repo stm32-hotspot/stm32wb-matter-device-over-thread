@@ -28,14 +28,14 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32wb5mm_dk_conf.h"
 #include "stm32wb5mm_dk_errno.h"
-#include "./../Components/Common/env_sensor.h"
+#include "env_sensor.h"
 
 #ifndef USE_ENV_SENSOR_STTS22H_0
 #define USE_ENV_SENSOR_STTS22H_0          1
 #endif
 
 #if (USE_ENV_SENSOR_STTS22H_0 == 1)
-#include "./../Components/stts22h/stts22h.h"
+#include "stts22h.h"
 #endif
 
 /** @addtogroup BSP BSP

@@ -27,7 +27,7 @@ extern "C" {
 
   /* Includes ------------------------------------------------------------------*/
 #include "mbox_def.h" /* Requested to expose the MB_WirelessFwInfoTable_t structure */
-
+  
   /* Exported types ------------------------------------------------------------*/
 
   /* SYSTEM EVENT */
@@ -436,7 +436,7 @@ extern "C" {
    * PrWriteListSize
    * NOTE: This parameter is ignored by the CPU2 when the parameter "Options" is set to "LL_only" ( see Options description in that structure )
    *
-   * Maximum number of supported "prepare write request"
+   * Maximum number of supported “prepare write request”
    *    - Min value: given by the macro DEFAULT_PREP_WRITE_LIST_SIZE
    *    - Max value: a value higher than the minimum required can be specified, but it is not recommended
    */
@@ -503,7 +503,7 @@ extern "C" {
    * MaxConnEventLength
    * This parameter determines the maximum duration of a slave connection event. When this duration is reached the slave closes
    * the current connections event (whatever is the CE_length parameter specified by the master in HCI_CREATE_CONNECTION HCI command),
-   * expressed in units of 625/256 us (~2.44 us)
+   * expressed in units of 625/256 µs (~2.44 µs)
    *    - Min value: 0 (if 0 is specified, the master and slave perform only a single TX-RX exchange per connection event)
    *    - Max value: 1638400 (4000 ms). A higher value can be specified (max 0xFFFFFFFF) but results in a maximum connection time
    *      of 4000 ms as specified. In this case the parameter is not applied, and the predicted CE length calculated on slave is not shortened
@@ -512,7 +512,7 @@ extern "C" {
 
   /**
    * HsStartupTime
-   * Startup time of the high speed (16 or 32 MHz) crystal oscillator in units of 625/256 us (~2.44 us).
+   * Startup time of the high speed (16 or 32 MHz) crystal oscillator in units of 625/256 µs (~2.44 µs).
    *    - Min value: 0
    *    - Max value:  820 (~2 ms). A higher value can be specified, but the value that implemented in stack is forced to ~2 ms
    */
@@ -535,10 +535,8 @@ extern "C" {
    * - bit 4:   1: CS Algo #2 supported             0: CS Algo #2 not supported
    * - bit 5:   1: Reduced GATT database in NVM     0: Full GATT database in NVM 
    * - bit 6:   1: GATT caching is used             0: GATT caching is not used
-   * - bit 7:   1: LE Power Class 1                 0: LE Power Classe 2-3
-   * - bit 8:   1: appearance Writable              0: appearance Read-Only
-   * - bit 9:   1: Enhanced ATT supported           0: Enhanced ATT not supported
-   * - other bits: reserved ( shall be set to 0)
+   * - bit 7:   1: LE Power Class 1                 0: LE Power Class 2-3
+   * - other bits: complete with Options_extension flag
    */
   uint8_t Options;
 
@@ -603,7 +601,15 @@ extern "C" {
    * values as: 11(5.2), 12(5.3)
    */
   uint8_t ble_core_version; 
-  
+ 
+   /**
+   * Options flags extension
+   * - bit 0:   1: appearance Writable              0: appearance Read-Only
+   * - bit 1:   1: Enhanced ATT supported           0: Enhanced ATT not supported
+   * - other bits: reserved ( shall be set to 0)
+   */
+  uint8_t Options_extension;
+
       } SHCI_C2_Ble_Init_Cmd_Param_t;
 
   typedef PACKED_STRUCT{
@@ -640,11 +646,16 @@ extern "C" {
 #define SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_1                        (1<<7)
 #define SHCI_C2_BLE_INIT_OPTIONS_POWER_CLASS_2_3                      (0<<7)
 
-#define SHCI_C2_BLE_INIT_OPTIONS_APPEARANCE_WRITABLE                  (1<<8)
-#define SHCI_C2_BLE_INIT_OPTIONS_APPEARANCE_READONLY                  (0<<8)
+  /**
+   * Options extension
+   * Each definition below may be added together to build the Options value
+   * WARNING : Only one definition per bit shall be added to build the Options value
+   */
+#define SHCI_C2_BLE_INIT_OPTIONS_APPEARANCE_WRITABLE                  (1<<0)
+#define SHCI_C2_BLE_INIT_OPTIONS_APPEARANCE_READONLY                  (0<<0)
 
-#define SHCI_C2_BLE_INIT_OPTIONS_ENHANCED_ATT_SUPPORTED               (1<<9)
-#define SHCI_C2_BLE_INIT_OPTIONS_ENHANCED_ATT_NOTSUPPORTED            (0<<9)
+#define SHCI_C2_BLE_INIT_OPTIONS_ENHANCED_ATT_SUPPORTED               (1<<1)
+#define SHCI_C2_BLE_INIT_OPTIONS_ENHANCED_ATT_NOTSUPPORTED            (0<<1)
   
     /**
    * RX models configuration
@@ -655,8 +666,9 @@ extern "C" {
   /**
    * BLE core version
    */
-#define SHCI_C2_BLE_INIT_BLE_CORE_5_2               11 
+#define SHCI_C2_BLE_INIT_BLE_CORE_5_2               11
 #define SHCI_C2_BLE_INIT_BLE_CORE_5_3               12
+#define SHCI_C2_BLE_INIT_BLE_CORE_5_4               13
   
    /**
    * LsSource information
@@ -893,7 +905,7 @@ extern "C" {
 #define FUS_DEVICE_INFO_TABLE_VALIDITY_KEYWORD    (0xA94656B9)
 
 /*
-  *   At startup, the informations relative to the wireless binary are stored in RAM trough a structure defined by
+  *   At startup, the information relative to the wireless binary are stored in RAM through a structure defined by
   *   MB_WirelessFwInfoTable_t.This structure contains 4 fields (Version,MemorySize, Stack_info and a reserved part)
   *   each of those coded on 32 bits as shown on the table below:
   *
@@ -954,7 +966,6 @@ extern "C" {
 #define INFO_STACK_TYPE_MAC                         0x40
 #define INFO_STACK_TYPE_BLE_THREAD_FTD_STATIC       0x50
 #define INFO_STACK_TYPE_BLE_THREAD_FTD_DYAMIC       0x51
-#define INFO_STACK_TYPE_BLE_THREAD_FOR_MATTER       0x52
 #define INFO_STACK_TYPE_802154_LLD_TESTS            0x60
 #define INFO_STACK_TYPE_802154_PHY_VALID            0x61
 #define INFO_STACK_TYPE_BLE_PHY_VALID               0x62
@@ -1140,7 +1151,7 @@ typedef struct {
   * @brief Starts the LLD tests CLI
   *
   * @param  param_size : Nb of bytes
-  * @param  p_param : pointeur with data to give from M4 to M0
+  * @param  p_param : pointer with data to give from M4 to M0
   * @retval Status
   */
   SHCI_CmdStatus_t SHCI_C2_LLDTESTS_Init( uint8_t param_size, uint8_t * p_param );
@@ -1150,7 +1161,7 @@ typedef struct {
   * @brief Starts the LLD tests BLE
   *
   * @param  param_size : Nb of bytes
-  * @param  p_param : pointeur with data to give from M4 to M0
+  * @param  p_param : pointer with data to give from M4 to M0
   * @retval Status
   */
   SHCI_CmdStatus_t SHCI_C2_BLE_LLD_Init( uint8_t param_size, uint8_t * p_param );
@@ -1250,7 +1261,7 @@ typedef struct {
 
   /**
    * SHCI_GetWirelessFwInfo
-   * @brief This function read back the informations relative to the wireless binary loaded.
+   * @brief This function read back the information relative to the wireless binary loaded.
    *         Refer yourself to MB_WirelessFwInfoTable_t structure to get the significance
    *         of the different parameters returned.
    * @param  pWirelessInfo : Pointer to WirelessFwInfo_t.

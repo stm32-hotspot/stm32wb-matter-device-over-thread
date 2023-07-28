@@ -138,12 +138,20 @@ The Peripheral device (P2P Server) starts a fast advertising after reset for 30 
 After reset, OpenThread is started and nodes tries to build up a Thread network or attach to a existing one
 
 
-**** BUTTON/LED SUMMARY ****
-
-
-Button Mapping :
-- Button 1 : Press the button for at least 10 seconds to do a factory reset
-
+**** LCD SUMMARY ****
+LCD Mapping :
+ - The LCD screen displays "BLE connected" when the BLE rendezvous started.
+ - The LCD screen displays "Network Joined" when the board joined a thread network.
+ - The LCD screen displays "LED ON" + the light level (value between 0 and 255) when using "LIGHT ON/OFF & LEVEL CLUSTER" 
+   and pressing "On" and erase this line when pressing "Off" on Android phone.
+ - The LCD screen displays: "Fabric Created": if commissioning success.
+                            "Fabric Failed" : if commissioning failed.
+                            "Fabric Found"  : if the credentials from the non-volatile memory(NVM)
+                                              have been found 
+****  BUTTON SUMMARY ****
+Button Mapping:
+- Button 1 : Press the button for at least 10 seconds to do a factory reset.
+          Push the button the save the non-volatile memory after unpairing the device then power off the board.
 
 Coprocessor firmware:
 The Coprocessor firmware remains unchanged. It has been tested with the binary listed above.

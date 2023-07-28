@@ -39,6 +39,9 @@
 
 namespace chip {
 namespace app {
+
+class TestReadInteraction;
+
 namespace reporting {
 /*
  *  @class Engine
@@ -138,6 +141,9 @@ private:
     void Run();
 
     friend class TestReportingEngine;
+    friend class ::chip::app::TestReadInteraction;
+
+    bool IsRunScheduled() const { return mRunScheduled; }
 
     struct AttributePathParamsWithGeneration : public AttributePathParams
     {

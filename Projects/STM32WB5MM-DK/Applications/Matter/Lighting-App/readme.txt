@@ -18,12 +18,12 @@
   ******************************************************************************
   @endverbatim
 
-### 09-Feb-2023 ###
+### 20-Jul-2023 ###
 ========================
 
 STM32WB-Matter-BLE-Thread example is based on Matter and behaves as a Matter accessory communicating over a 802.15.4 Thread network.
 It can be paired into an existing matter network and can be controlled by this network.
-The STM32WB55xx-Nucleo board running Ble_Thread_Dynamic application is capable 
+The STM32WB55xx-Nucleo board running lighting-app application is capable 
 of BLE and OpenThread activity at the same time.
 
 @par Keywords
@@ -33,7 +33,7 @@ COAP,THREAD,BLE,Matter
 @par Directory contents 
 
  
-  Using Matter v1.0.0 SDK.
+  Using Matter v1.1.0 SDK.
   
 
   - Matter/Lighting-App/STM32_WPAN/App/app_ble.h            Header for app_ble.c module
@@ -74,23 +74,9 @@ COAP,THREAD,BLE,Matter
  
 @par Hardware and Software environment
 
-  - This example has been tested with an STMicroelectronics STM32WB55RG-Nucleo 
+  - This example has been tested with an STMicroelectronics STM32WB5MM-DK 
     board 
     
-  - On STM32WB55RG-Nucleo, the jumpers must be configured as described
-    in this section. Starting from the top left position up to the bottom 
-    right position, the jumpers on the Board must be set as follows:
-
-     CN11:    GND         [OFF]
-     JP4:     VDDRF       [ON]
-     JP6:     VC0         [ON]
-     JP2:     +3V3        [ON] 
-     JP1:     USB_STL     [ON]   All others [OFF]
-     CN12:    GND         [OFF]
-     CN7:     <All>       [OFF]
-     JP3:     VDD_MCU     [ON]
-     JP5:     GND         [OFF]  All others [ON]
-     CN10:    <All>       [OFF]
 
 
 @par How to use it ? 
@@ -105,7 +91,7 @@ Wireless Coprocessor binary.
 
 Minimum requirements for the demo:
 - 1 STM32WB5MM-DK board with Lighting-App firmware.
-- 1 STM32WB55xx-Nucleorunning a Thread RCP connected to a Raspberry pi 4 (recommanded) via FTDI
+- 1 STM32WB55xx-Nucleo board running a Thread RCP connected to a Raspberry pi 4 (recommanded) via FTDI
 - 1 Smartphone (Android) with "CHIPTool" Phone Application (available Utilities/APK/app-debug-v_1_0.zip)
 
 
@@ -138,7 +124,7 @@ The Peripheral device (P2P Server) starts a fast advertising after reset for 30 
 After reset, OpenThread is started and nodes tries to build up a Thread network or attach to a existing one
 
 
-**** BUTTON/LCD SUMMARY ****
+**** LCD SUMMARY ****
 LCD Mapping :
  - The LCD screen displays "BLE connected" when the BLE rendezvous started.
  - The LCD screen displays "Network Joined" when the board joined a thread network.
@@ -148,9 +134,10 @@ LCD Mapping :
                             "Fabric Failed" : if commissioning failed.
                             "Fabric Found"  : if the credentials from the non-volatile memory(NVM)
                                               have been found 
-Button Mapping :
-- Button 1 : Press the button for atleast 10 seconds to do a factory reset
-
+****  BUTTON SUMMARY ****
+Button Mapping:
+- Button 1 : Press the button for at least 10 seconds to do a factory reset.
+          Push the button the save the non-volatile memory after unpairing the device then power off the board.
 
 Coprocessor firmware:
 The Coprocessor firmware remains unchanged. It has been tested with the binary listed above.

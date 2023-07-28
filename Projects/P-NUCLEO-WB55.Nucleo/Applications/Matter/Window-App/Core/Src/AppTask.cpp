@@ -25,13 +25,14 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 #include "flash_wb.h"
+#if HIGHWATERMARK
+#include "memory_buffer_alloc.h"
+#endif
 
 /*Matter includes*/
 #include <app/server/OnboardingCodesUtil.h>
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -39,15 +40,13 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <inet/EndPointStateOpenThread.h>
-#include <DeviceInfoProviderImpl.h>
-#include <DeviceNetworkProvisioningDelegateImpl.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <platform/CHIPDeviceLayer.h>
+
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/stm32wb/ThreadStackManagerImpl.h>
 #endif
 
 using namespace ::chip;
@@ -62,11 +61,8 @@ using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 
 AppTask AppTask::sAppTask;
 chip::DeviceLayer::TestOnlyCommissionableDataProvider gTestOnlyCommissionableDataProvider;
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-//#define APP_ON_OFF_BUTTON BUTTON_USER1_PIN
 #define APP_FUNCTION_BUTTON BUTTON_SW1
-//#define APP_LEVEL_BUTTON BUTTON_USER3_PIN
 
 #define STM32ThreadDataSet "STM32DataSet"
 #define APP_EVENT_QUEUE_SIZE 10
@@ -85,6 +81,7 @@ APP_PRIORITY };
 static bool sIsThreadProvisioned = false;
 static bool sIsThreadEnabled = false;
 static bool sHaveBLEConnections = false;
+static bool sFabricNeedSaved = false;
 static uint8_t NvmTimerCpt = 0;
 static uint8_t NvmButtonStateCpt = 0;
 
@@ -147,8 +144,6 @@ CHIP_ERROR AppTask::Init() {
 	static chip::CommonCaseDeviceServerInitParams initParams;
 	(void) initParams.InitializeStaticResourcesBeforeServerInit();
 	chip::DeviceLayer::SetCommissionableDataProvider(&gTestOnlyCommissionableDataProvider);
-	gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
-	chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
 	chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
 	nativeParams.lockCb = LockOpenThreadTask;
@@ -170,9 +165,10 @@ CHIP_ERROR AppTask::Init() {
 		size_t datasetLength = 0;
 		APP_BLE_Init_Dyn_3();
 		CHIP_ERROR error = KeyValueStoreMgr().Get(STM32ThreadDataSet, datasetBytes, sizeof(datasetBytes), &datasetLength);
+		APP_DBG("Fabric found, join thread network");
 		if (error == CHIP_NO_ERROR) {
-			DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-			deviceDelegate.ProvisionThread(ByteSpan(datasetBytes, datasetLength));
+			ThreadStackMgr().SetThreadProvision(ByteSpan(datasetBytes, datasetLength));
+			ThreadStackMgr().SetThreadEnabled(true);
 		} else {
 			APP_DBG("Thread network Data set was not found");
 		}
@@ -186,15 +182,32 @@ CHIP_ERROR AppTask::Init() {
 	return err;
 }
 
-void AppTask::InitMatter() {
-	GetAppTask().StartAppTask();
+CHIP_ERROR AppTask::InitMatter() {
+	CHIP_ERROR err = CHIP_NO_ERROR;
+
+	err = chip::Platform::MemoryInit();
+	if (err != CHIP_NO_ERROR) {
+		APP_DBG("Platform::MemoryInit() failed");
+	} else {
+		APP_DBG("Init CHIP stack");
+		err = PlatformMgr().InitChipStack();
+		if (err != CHIP_NO_ERROR) {
+			APP_DBG("PlatformMgr().InitChipStack() failed");
+		}
+	}
+	return err;
 }
 
 void AppTask::AppTaskMain(void *pvParameter) {
 	AppEvent event;
 
 	CHIP_ERROR err = sAppTask.Init();
-
+#if HIGHWATERMARK
+	UBaseType_t uxHighWaterMark;
+	HeapStats_t HeapStatsInfo;
+	size_t max_used;
+	size_t max_blocks;
+#endif // endif HIGHWATERMARK
 	if (err != CHIP_NO_ERROR) {
 		APP_DBG("App task init failled ");
 	}
@@ -207,6 +220,12 @@ void AppTask::AppTaskMain(void *pvParameter) {
 			sAppTask.DispatchEvent(&event);
 			eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
 		}
+#if HIGHWATERMARK
+		uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+		vPortGetHeapStats(&HeapStatsInfo);
+		mbedtls_memory_buffer_alloc_max_get(&max_used, &max_blocks );
+
+#endif // endif HIGHWATERMARK
 	}
 
 }
@@ -311,15 +330,23 @@ void AppTask::UpdateLEDs(void) {
 
 void AppTask::UpdateNvmEventHandler(AppEvent *aEvent) {
 
+	NVM_StatusTypeDef err = NVM_OK;
 	if (sAppTask.mFunction == kFunction_SaveNvm) {
 		if (sIsThreadProvisioned && sIsThreadEnabled) {
 			chip::Thread::OperationalDataset dataset { };
 			DeviceLayer::ThreadStackMgrImpl().GetThreadProvision(dataset);
 			ByteSpan datasetbyte = dataset.AsByteSpan();
-			KeyValueStoreMgr().Put(STM32ThreadDataSet, datasetbyte.data(), datasetbyte.size());
+			KeyValueStoreMgr().Put(STM32ThreadDataSet, datasetbyte.data(),
+					datasetbyte.size());
 		}
-		APP_DBG("SAVE NVM");
-		NM_Dump();
+		err = NM_Dump();
+		if (err == NVM_OK) {
+			APP_DBG("SAVE NVM");
+		} else {
+			APP_DBG("Failed to SAVE NVM");
+			xTimerStart(DelayNvmTimer, 0);
+		}
+	
 
 	} else if (sAppTask.mFunction == kFunction_FactoryReset) {
 		APP_DBG("FACTORY RESET");
@@ -350,11 +377,23 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t) {
 	case DeviceEventType::kCHIPoBLEConnectionClosed: {
 		sHaveBLEConnections = false;
 		UpdateLEDs();
+		if (sFabricNeedSaved) {
+			APP_DBG("Start timer to save nvm after commissioning finish");
+			// timer is used to avoid to much trafic on m0 side after the end of a commissioning
+			xTimerStart(DelayNvmTimer, 0);
+			sFabricNeedSaved = false;
+		}
 		break;
 	}
 
 	case DeviceEventType::kCommissioningComplete: {
-		xTimerStart(DelayNvmTimer, 0);
+		sFabricNeedSaved = true;
+		// check if ble is on, since before save in nvm we need to stop m0, Better to write in nvm when m0 is less busy
+		if (sHaveBLEConnections == false) {
+			APP_DBG("Start timer to save nvm after commissioning finish");
+			xTimerStart(DelayNvmTimer, 0);
+			sFabricNeedSaved = false; // put to false to avoid save in nvm 2 times
+		}
 		break;
 	}
 

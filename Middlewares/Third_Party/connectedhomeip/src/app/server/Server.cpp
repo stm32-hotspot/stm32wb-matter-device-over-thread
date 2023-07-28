@@ -43,6 +43,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/LockTracker.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/SetupPayload.h>
@@ -68,15 +69,6 @@ using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
 
 namespace {
-
-void StopEventLoop(intptr_t arg)
-{
-    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Stopping event loop: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
 
 class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
 {
@@ -105,6 +97,9 @@ static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BU
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
     ChipLogProgress(AppServer, "Server initializing...");
+    assertChipStackLockedByCurrentThread();
+
+    mInitTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
 
     CASESessionManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
@@ -119,6 +114,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.accessDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.aclStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.sessionKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -126,12 +122,20 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     chip::Platform::MemoryInit();
 
     // Initialize PersistentStorageDelegate-based storage
-    mDeviceStorage            = initParams.persistentStorageDelegate;
-    mSessionResumptionStorage = initParams.sessionResumptionStorage;
-    mOperationalKeystore      = initParams.operationalKeystore;
-    mOpCertStore              = initParams.opCertStore;
+    mDeviceStorage                 = initParams.persistentStorageDelegate;
+    mSessionResumptionStorage      = initParams.sessionResumptionStorage;
+    mSubscriptionResumptionStorage = initParams.subscriptionResumptionStorage;
+    mOperationalKeystore           = initParams.operationalKeystore;
+    mOpCertStore                   = initParams.opCertStore;
 
-    mCertificateValidityPolicy = initParams.certificateValidityPolicy;
+    if (initParams.certificateValidityPolicy)
+    {
+        mCertificateValidityPolicy.Init(initParams.certificateValidityPolicy);
+    }
+    else
+    {
+        mCertificateValidityPolicy.Init(&sDefaultCertValidityPolicy);
+    }
 
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT)
     VerifyOrDie(chip::audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
@@ -200,7 +204,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
     SuccessOrExit(err);
 
-    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, mDeviceStorage, &GetFabricTable());
+    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, mDeviceStorage, &GetFabricTable(),
+                         *initParams.sessionKeystore);
     SuccessOrExit(err);
 
     err = mFabricDelegate.Init(this);
@@ -225,7 +230,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
-    err = sGlobalEventIdCounter.Init(mDeviceStorage, &DefaultStorageKeyAllocator::IMEventNumber,
+    err = sGlobalEventIdCounter.Init(mDeviceStorage, DefaultStorageKeyAllocator::IMEventNumber(),
                                      CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH);
     SuccessOrExit(err);
 
@@ -237,12 +242,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         };
 
         chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                       &logStorageResources[0], &sGlobalEventIdCounter);
+                                                       &logStorageResources[0], &sGlobalEventIdCounter,
+                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
     // This initializes clusters, so should come after lower level initialization.
-    InitDataModelHandler(&mExchangeMgr);
+    InitDataModelHandler();
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
@@ -287,24 +293,25 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
             .sessionResumptionStorage = mSessionResumptionStorage,
-            .certificateValidityPolicy = mCertificateValidityPolicy,
+            .certificateValidityPolicy = &mCertificateValidityPolicy,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
-            .clientPool        = &mCASEClientPool,
             .groupDataProvider = mGroupsProvider,
             .mrpLocalConfig    = GetLocalMRPConfig(),
         },
-        .sessionSetupPool        = &mSessionSetupPool,
+        .clientPool            = &mCASEClientPool,
+        .sessionSetupPool      = &mSessionSetupPool,
     };
 
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
-                                                    mCertificateValidityPolicy, mGroupsProvider);
+                                                    &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager,
+                                                                 mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -351,7 +358,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         }
     }
 
+    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     PlatformMgr().HandleServerStarted();
+
+    mIsDnssdReady = Dnssd::Resolver::Instance().IsInitialized();
+    CheckServerReadyEvent();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -364,6 +375,46 @@ exit:
         ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
+}
+
+void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
+{
+    switch (event.Type)
+    {
+    case DeviceEventType::kDnssdInitialized:
+        // Platform DNS-SD implementation uses kPlatformDnssdInitialized event to signal that it's ready.
+        if (!mIsDnssdReady)
+        {
+            mIsDnssdReady = true;
+            CheckServerReadyEvent();
+        }
+        break;
+    case DeviceEventType::kServerReady:
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+        ResumeSubscriptions();
+#endif
+        break;
+    default:
+        break;
+    }
+}
+
+void Server::CheckServerReadyEvent()
+{
+    // Check if all asynchronously initialized server components (currently, only DNS-SD)
+    // are ready, and emit the 'server ready' event if so.
+    if (mIsDnssdReady)
+    {
+        ChipLogError(AppServer, "Server initialization complete");
+
+        ChipDeviceEvent event = { .Type = DeviceEventType::kServerReady };
+        PlatformMgr().PostEventOrDie(&event);
+    }
+}
+
+void Server::OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t server)
+{
+    reinterpret_cast<Server *>(server)->OnPlatformEvent(*event);
 }
 
 void Server::RejoinExistingMulticastGroups()
@@ -399,10 +450,9 @@ void Server::RejoinExistingMulticastGroups()
     }
 }
 
-void Server::DispatchShutDownAndStopEventLoop()
+void Server::GenerateShutDownEvent()
 {
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
-    PlatformMgr().ScheduleWork(StopEventLoop);
 }
 
 void Server::ScheduleFactoryReset()
@@ -417,6 +467,8 @@ void Server::ScheduleFactoryReset()
 
 void Server::Shutdown()
 {
+    assertChipStackLockedByCurrentThread();
+    PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
@@ -430,6 +482,7 @@ void Server::Shutdown()
     mSessions.Shutdown();
     mTransports.Close();
     mAccessControl.Finish();
+    Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
@@ -473,5 +526,31 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     return err;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+void Server::ResumeSubscriptions()
+{
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Error when trying to resume subscriptions : %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+#endif
+
+Credentials::IgnoreCertificateValidityPeriodPolicy Server::sDefaultCertValidityPolicy;
+
+KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
+PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
+Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
+Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
+#endif
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubscriptionResumptionStorage;
+#endif
+app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
+Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
 
 } // namespace chip

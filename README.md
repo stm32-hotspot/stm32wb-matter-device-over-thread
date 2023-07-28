@@ -1,6 +1,5 @@
 # STM32WB Matter Device Over Thread MCU Firmware Package
 
-![latest tag](https://img.shields.io/github/v/tag/stm32-hotspot/stm32wb-matter-device-over-thread.svg?color=brightgreen)
 
 ## Overview
 
@@ -20,10 +19,6 @@ This Hotspot FW package includes:
 
 MATTER, CHIP, Connectedhomeip, IoT, Internet of Things, Network, Connectivity, FreeRTOS, LwIP, commissioning, CSA, Connectivity Standard Alliance,
 STM32 , P-NUCLEO-WB55 , STM32WB5MM-DK, OpenThread, BLE. 
-
-## Release note
-
-Details about the content of this release are available in the release note [here](https://htmlpreview.github.io/?https://github.com/stm32-hotspot/stm32wb-matter-device-over-thread/blob/main/Release_Notes.html).
 
 ## Boards Needed
   * as Matter accessory P-NUCLEO-WB55 or STM32WB5MM-DK
@@ -80,7 +75,7 @@ In a matter ecosystem with an end device over thread , a thread border router is
 
      Tap Install unknown apps
 
-     Select the Chip-toolAPK V1.0 from the file management apps.
+     Select the Chip-toolAPK V1.1 from the file management apps.
 
      Tap the Allow from this source slider to allow APK files to be installed.
 
@@ -148,8 +143,7 @@ The LCD screen displays "LED ON" + the light level when using "LIGHT ON/OFF & LE
     commissioning process is attempted. For this, factory reset the device by pressing SW1 or B1 for at least 10sec, then do a hardware
     reset then reset the RCP device or execute in the raspberry terminal ot-ctl srp server disable ; ot-ctl srp server enable, then restart the Android application . After this step, the commissioning process of the device can start.
 -   Due to some MDNS issues, the commissioning with some Wi-Fi access point may fail.
--  Numerous compilation warnings, mostly in the Matter SDK.
-- The upstream application build is supported on Windows, MacOS and Linux. However the package itself has only been tested on a Windows 10 host.
+-   The upstream application build is supported on Windows, MacOS and Linux. However the package itself has only been tested on a Windows 10 host.
 
 
 ## Troubleshooting

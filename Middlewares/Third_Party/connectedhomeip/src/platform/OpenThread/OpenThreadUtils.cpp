@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -68,11 +68,11 @@ bool FormatOpenThreadError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 #if CHIP_CONFIG_SHORT_ERROR_STR
     const char * desc = NULL;
 #else  // CHIP_CONFIG_SHORT_ERROR_STR
-    //otError otErr     = (otError) err.GetValue();
-   // const char * desc = otThreadErrorToString(otErr);
+    otError otErr     = (otError) err.GetValue();
+    const char * desc = otThreadErrorToString(otErr);
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
 
-   // chip::FormatError(buf, bufSize, "OpenThread", err, desc);
+    chip::FormatError(buf, bufSize, "OpenThread", err, desc);
 
     return true;
 }
@@ -105,6 +105,7 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
 #endif
 
     static char strBuf[64];
+
     ChipLogDetail(DeviceLayer, "OpenThread State Changed (Flags: 0x%08" PRIx32 ")", flags);
     if ((flags & OT_CHANGED_THREAD_ROLE) != 0)
     {
@@ -236,13 +237,13 @@ void LogOpenThreadPacket(const char * titleStr, otMessage * pkt)
             snprintf(destStr + strlen(destStr), 13, ", port %u", Encoding::BigEndian::Get16(IPv6_DestPort));
         }
 
-        ChipLogDetail(DeviceLayer, "%s: %s, len %u", titleStr, type, pktLen);
+        ChipLogDetail(DeviceLayer, "%s: %s, len %u", StringOrNullMarker(titleStr), type, pktLen);
         ChipLogDetail(DeviceLayer, "    src  %s", srcStr);
         ChipLogDetail(DeviceLayer, "    dest %s", destStr);
     }
     else
     {
-        ChipLogDetail(DeviceLayer, "%s: %s, len %u", titleStr, "(decode error)", pktLen);
+        ChipLogDetail(DeviceLayer, "%s: %s, len %u", StringOrNullMarker(titleStr), "(decode error)", pktLen);
     }
 
 #endif // CHIP_DETAIL_LOGGING

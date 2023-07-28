@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the chip Device Layer
- *          on stm32wb platforms.
+ *          on stm32 platforms.
  */
 #pragma once 
 
@@ -27,7 +27,7 @@
 #define CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE CHIP_PLATFORM_CONFIG_INCLUDE
 
 // ==================== Platform Adaptations ====================
-#define CHIP_DEVICE_LAYER_TARGET stm32wb
+#define CHIP_DEVICE_LAYER_TARGET stm32
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 
@@ -51,9 +51,14 @@
 
 // ========== Platform-specific Configuration Overrides =========
 
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_NAME  "STM32WB TASK"
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (8 * 1024)
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_NAME  "STM32 TASK"
 
+/**
+ * CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
+ *
+ * The stack size of the chip task.
+ */
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (8 * 1024)
 
 /**
  * CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY
@@ -61,6 +66,12 @@
  * The priority of the chip task.
  */
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY 24
+
+/**
+ * CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY
+ *
+ * The stack size of thread task.
+ */
 #define CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE (4 * 1024)
 
 /**

@@ -125,7 +125,7 @@ void ExchangeContext::UpdateSEDIntervalMode(bool activeMode)
     if (activeMode != IsRequestingActiveMode())
     {
         SetRequestingActiveMode(activeMode);
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(activeMode);
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(activeMode, true);
     }
 }
 #endif
@@ -156,6 +156,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     bool reliableTransmissionRequested =
         GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
+    bool startedResponseTimer = false;
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
     {
@@ -177,6 +178,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 SetResponseExpected(false);
                 return err;
             }
+            startedResponseTimer = true;
         }
     }
 
@@ -217,8 +219,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 #endif
-
-        if (err != CHIP_NO_ERROR && IsResponseExpected())
+        // We should only cancel the response timer if the ExchangeContext fails to send the message that starts the response timer.
+        if (err != CHIP_NO_ERROR && startedResponseTimer)
         {
             CancelResponseTimer();
             SetResponseExpected(false);
@@ -267,8 +269,11 @@ void ExchangeContext::DoClose(bool clearRetransTable)
         mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
     }
 
-    // Cancel the response timer.
-    CancelResponseTimer();
+    if (IsResponseExpected())
+    {
+        // Cancel the response timer.
+        CancelResponseTimer();
+    }
 }
 
 /**
@@ -480,6 +485,11 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
     SetResponseExpected(false);
 
+    // Hold a ref to ourselves so we can make calls into our delegate that might
+    // decrease our refcount (e.g. by expiring out session) without worrying
+    // about use-after-free.
+    ExchangeHandle ref(*this);
+
     // mSession might be null if this timeout is due to the session being
     // evicted.
     if (mSession)
@@ -573,12 +583,27 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_NO_ERROR;
     }
 
-    // Since we got the response, cancel the response timer.
-    CancelResponseTimer();
+    if (IsMessageNotAcked())
+    {
+        // The only way we can get here is a spec violation on the other side:
+        // we sent a message that needs an ack, and the other side responded
+        // with a message that does not contain an ack for the message we sent.
+        // Just drop this message; if we delivered it to our delegate it might
+        // try to send another message-needing-an-ack in response, which would
+        // violate our internal invariants.
+        ChipLogError(ExchangeManager, "Dropping message without piggyback ack when we are waiting for an ack.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
 
-    // If the context was expecting a response to a previously sent message, this message
-    // is implicitly that response.
-    SetResponseExpected(false);
+    if (IsResponseExpected())
+    {
+        // Since we got the response, cancel the response timer.
+        CancelResponseTimer();
+
+        // If the context was expecting a response to a previously sent message, this message
+        // is implicitly that response.
+        SetResponseExpected(false);
+    }
 
     // Don't send messages on to our delegate if our dispatch does not allow
     // those messages.

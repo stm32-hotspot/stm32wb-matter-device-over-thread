@@ -48,15 +48,16 @@ CHIP_ERROR WriteHandler::Init()
 
 void WriteHandler::Close()
 {
-    mSuppressResponse = false;
     VerifyOrReturn(mState != State::Uninitialized);
 
-    ClearState();
-}
-
-void WriteHandler::Abort()
-{
-    ClearState();
+    // DeliverFinalListWriteEnd will be a no-op if we have called
+    // DeliverFinalListWriteEnd in success conditions, so passing false for
+    // wasSuccessful here is safe: if it does anything, we were in fact not
+    // successful.
+    DeliverFinalListWriteEnd(false /* wasSuccessful */);
+    mExchangeCtx.Release();
+    mSuppressResponse = false;
+    MoveToState(State::Uninitialized);
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -291,16 +292,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
-        err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetAttribute(&(dataAttributePath.mAttributeId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetListIndex(dataAttributePath);
+        err = attributePath.GetConcreteAttributePath(dataAttributePath);
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
@@ -406,13 +398,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
-        err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetAttribute(&(dataAttributePath.mAttributeId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetListIndex(dataAttributePath);
+        err = attributePath.GetGroupAttributePath(dataAttributePath);
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
@@ -554,9 +540,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     err = writeRequestParser.Init(reader);
     SuccessOrExit(err);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = writeRequestParser.CheckSchemaValidity();
-    SuccessOrExit(err);
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    writeRequestParser.PrettyPrint();
 #endif
     err = writeRequestParser.GetSuppressResponse(&mSuppressResponse);
     if (err == CHIP_END_OF_TLV)
@@ -690,13 +675,6 @@ void WriteHandler::MoveToState(const State aTargetState)
 {
     mState = aTargetState;
     ChipLogDetail(DataManagement, "IM WH moving to [%s]", GetStateStr());
-}
-
-void WriteHandler::ClearState()
-{
-    DeliverFinalListWriteEnd(false /* wasSuccessful */);
-    mExchangeCtx.Release();
-    MoveToState(State::Uninitialized);
 }
 
 } // namespace app

@@ -26,6 +26,7 @@
 #include "ble.h"
 #include "app_matter.h"
 #include "cmsis_os.h"
+#include "custom_stm.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -106,13 +107,13 @@ void APP_MATTER_BLE_Set_Ack_After_Indicate_Callback(BLEDAckCallback aCallback) {
 }
 
 /* Functions Definition ------------------------------------------------------*/
-void MATTER_APP_Notification(MATTER_App_Notification_evt_t *pNotification) {
-	/* USER CODE BEGIN MATTER_APP_Notification_1 */
+void APP_MATTER_Notification(MATTER_App_Notification_evt_t *pNotification) {
+	/* USER CODE BEGIN APP_MATTER_Notification */
 	BLE_Matter_TXCharCCCD message;
-	/* USER CODE END MATTER_APP_Notification_1 */
+	/* USER CODE END APP_MATTER_Notification */
 	switch (pNotification->P2P_Evt_Opcode) {
-	/* USER CODE BEGIN MATTER_APP_Notification_P2P_Evt_Opcode */
-	/* USER CODE END MATTER_APP_Notificationn_P2P_Evt_Opcode */
+	/* USER CODE BEGIN APP_MATTER_Notification */
+	/* USER CODE END APP_MATTER_Notification */
 
 	case MATTER_STM_PEER_CONN_HANDLE_EVT:
 		/* USER CODE BEGIN PEER_CONN_HANDLE_EVT */
@@ -167,14 +168,14 @@ void MATTER_APP_Notification(MATTER_App_Notification_evt_t *pNotification) {
 		break;
 
 	default:
-		/* USER CODE BEGIN MATTER_APP_Notification_default */
+		/* USER CODE BEGIN APP_MATTER_Notification */
 
-		/* USER CODE END MATTER_APP_Notification_default */
+		/* USER CODE END APP_MATTER_Notification */
 		break;
 	}
-	/* USER CODE BEGIN MATTER_APP_Notification_2 */
+	/* USER CODE BEGIN APP_MATTER_Notification */
 
-	/* USER CODE END MATTER_APP_Notification_2 */
+	/* USER CODE END APP_MATTER_Notification */
 	return;
 }
 
@@ -208,7 +209,7 @@ void APP_MATTER_Send_Notification(uint16_t datalength, uint8_t *data) {
 	}
 
 	if (P2P_Server_App_Context.Notification_Status) {
-		MATTER_STM_App_Update_Char(P2P_NOTIFY_CHAR_UUID, (uint8_t*) data, datalength);
+		CUSTOM_STM_App_Update_Char(P2P_NOTIFY_CHAR_UUID, (uint8_t*) data, datalength);
 	} else {
 		APP_DBG_MSG("-- Matter APPLICATION SERVER : CAN'T INFORM CLIENT -  NOTIFICATION DISABLED\n ");
 	}

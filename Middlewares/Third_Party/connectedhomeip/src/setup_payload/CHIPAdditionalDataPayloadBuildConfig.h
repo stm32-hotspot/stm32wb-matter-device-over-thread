@@ -20,7 +20,7 @@
  *    @file
  *          Platform-specific configuration to enable optional rotating \
  *          device id to the additional data \ 
- *          on stm32wb platforms.
+ *          on stm32 platforms.
  */
 #pragma once 
 

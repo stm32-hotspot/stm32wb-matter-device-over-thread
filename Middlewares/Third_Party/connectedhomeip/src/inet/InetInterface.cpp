@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -56,7 +56,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-#include <net/net_if.h>
+#include <zephyr/net/net_if.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
@@ -423,7 +423,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        strncpy(nameBuf, intfName, nameLength + 1);
+        Platform::CopyString(nameBuf, nameBufSize, intfName);
         return CHIP_NO_ERROR;
     }
     if (nameBufSize < 1)
@@ -507,143 +507,6 @@ void CloseIOCTLSocket()
     }
 }
 
-#if __ANDROID__ && __ANDROID_API__ < 24
-
-static struct if_nameindex * backport_if_nameindex(void);
-static void backport_if_freenameindex(struct if_nameindex *);
-
-static void backport_if_freenameindex(struct if_nameindex * inArray)
-{
-    if (inArray == NULL)
-    {
-        return;
-    }
-
-    for (size_t i = 0; inArray[i].if_index != 0; i++)
-    {
-        if (inArray[i].if_name != NULL)
-        {
-            Platform::MemoryFree(inArray[i].if_name);
-        }
-    }
-
-    Platform::MemoryFree(inArray);
-}
-
-static struct if_nameindex * backport_if_nameindex(void)
-{
-    int err;
-    unsigned index;
-    size_t intfIter              = 0;
-    size_t maxIntfNum            = 0;
-    size_t numIntf               = 0;
-    size_t numAddrs              = 0;
-    struct if_nameindex * retval = NULL;
-    struct if_nameindex * tmpval = NULL;
-    struct ifaddrs * addrList    = NULL;
-    struct ifaddrs * addrIter    = NULL;
-    const char * lastIntfName    = "";
-
-    err = getifaddrs(&addrList);
-    VerifyOrExit(err >= 0, );
-
-    // coalesce on consecutive interface names
-    for (addrIter = addrList; addrIter != NULL; addrIter = addrIter->ifa_next)
-    {
-        numAddrs++;
-        if (strcmp(addrIter->ifa_name, lastIntfName) == 0)
-        {
-            continue;
-        }
-        numIntf++;
-        lastIntfName = addrIter->ifa_name;
-    }
-
-    tmpval = (struct if_nameindex *) Platform::MemoryAlloc((numIntf + 1) * sizeof(struct if_nameindex));
-    VerifyOrExit(tmpval != NULL, );
-    memset(tmpval, 0, (numIntf + 1) * sizeof(struct if_nameindex));
-
-    lastIntfName = "";
-    for (addrIter = addrList; addrIter != NULL; addrIter = addrIter->ifa_next)
-    {
-        if (strcmp(addrIter->ifa_name, lastIntfName) == 0)
-        {
-            continue;
-        }
-
-        index = if_nametoindex(addrIter->ifa_name);
-        if (index != 0)
-        {
-            tmpval[intfIter].if_index = index;
-            tmpval[intfIter].if_name  = strdup(addrIter->ifa_name);
-            intfIter++;
-        }
-        lastIntfName = addrIter->ifa_name;
-    }
-
-    // coalesce on interface index
-    maxIntfNum = 0;
-    for (size_t i = 0; tmpval[i].if_index != 0; i++)
-    {
-        if (maxIntfNum < tmpval[i].if_index)
-        {
-            maxIntfNum = tmpval[i].if_index;
-        }
-    }
-
-    retval = (struct if_nameindex *) Platform::MemoryAlloc((maxIntfNum + 1) * sizeof(struct if_nameindex));
-    VerifyOrExit(retval != NULL, );
-    memset(retval, 0, (maxIntfNum + 1) * sizeof(struct if_nameindex));
-
-    for (size_t i = 0; tmpval[i].if_index != 0; i++)
-    {
-        struct if_nameindex * intf = &tmpval[i];
-        if (retval[intf->if_index - 1].if_index == 0)
-        {
-            retval[intf->if_index - 1] = *intf;
-        }
-        else
-        {
-            free(intf->if_name);
-            intf->if_index = 0;
-            intf->if_name  = 0;
-        }
-    }
-
-    intfIter = 0;
-
-    // coalesce potential gaps between indeces
-    for (size_t i = 0; i < maxIntfNum; i++)
-    {
-        if (retval[i].if_index != 0)
-        {
-            retval[intfIter] = retval[i];
-            intfIter++;
-        }
-    }
-
-    for (size_t i = intfIter; i < maxIntfNum; i++)
-    {
-        retval[i].if_index = 0;
-        retval[i].if_name  = NULL;
-    }
-
-exit:
-    if (tmpval != NULL)
-    {
-        Platform::MemoryFree(tmpval);
-    }
-
-    if (addrList != NULL)
-    {
-        freeifaddrs(addrList);
-    }
-
-    return retval;
-}
-
-#endif // __ANDROID__ && __ANDROID_API__ < 24
-
 InterfaceIterator::InterfaceIterator()
 {
     mIntfArray       = nullptr;
@@ -656,11 +519,7 @@ InterfaceIterator::~InterfaceIterator()
 {
     if (mIntfArray != nullptr)
     {
-#if __ANDROID__ && __ANDROID_API__ < 24
-        backport_if_freenameindex(mIntfArray);
-#else
         if_freenameindex(mIntfArray);
-#endif
         mIntfArray = nullptr;
     }
 }
@@ -674,11 +533,7 @@ bool InterfaceIterator::Next()
 {
     if (mIntfArray == nullptr)
     {
-#if __ANDROID__ && __ANDROID_API__ < 24
-        mIntfArray = backport_if_nameindex();
-#else
         mIntfArray = if_nameindex();
-#endif
     }
     else if (mIntfArray[mCurIntf].if_index != 0)
     {
@@ -698,7 +553,7 @@ CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSiz
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    strncpy(nameBuf, mIntfArray[mCurIntf].if_name, nameBufSize);
+    Platform::CopyString(nameBuf, nameBufSize, mIntfArray[mCurIntf].if_name);
     return CHIP_NO_ERROR;
 }
 
@@ -723,8 +578,7 @@ short InterfaceIterator::GetFlags()
 
     if (!mIntfFlagsCached && HasCurrent())
     {
-        strncpy(intfData.ifr_name, mIntfArray[mCurIntf].if_name, IFNAMSIZ);
-        intfData.ifr_name[IFNAMSIZ - 1] = '\0';
+        Platform::CopyString(intfData.ifr_name, mIntfArray[mCurIntf].if_name);
 
         int res = ioctl(GetIOCTLSocket(), SIOCGIFFLAGS, &intfData);
         if (res == 0)
@@ -843,7 +697,7 @@ CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nam
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(strlen(mCurAddr->ifa_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    strncpy(nameBuf, mCurAddr->ifa_name, nameBufSize);
+    Platform::CopyString(nameBuf, nameBufSize, mCurAddr->ifa_name);
     return CHIP_NO_ERROR;
 }
 
@@ -916,7 +770,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        strncpy(nameBuf, name, nameLength + 1);
+        Platform::CopyString(nameBuf, nameBufSize, name);
         return CHIP_NO_ERROR;
     }
     if (nameBufSize < 1)

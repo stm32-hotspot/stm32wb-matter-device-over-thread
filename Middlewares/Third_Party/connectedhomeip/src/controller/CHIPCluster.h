@@ -50,12 +50,17 @@ template <typename T>
 using ReadResponseSuccessCallback     = void (*)(void * context, T responseData);
 using ReadResponseFailureCallback     = void (*)(void * context, CHIP_ERROR err);
 using ReadDoneCallback                = void (*)(void * context);
-using SubscriptionEstablishedCallback = void (*)(void * context);
+using SubscriptionEstablishedCallback = void (*)(void * context, SubscriptionId subscriptionId);
 using ResubscriptionAttemptCallback   = void (*)(void * context, CHIP_ERROR aError, uint32_t aNextResubscribeIntervalMsec);
+using SubscriptionOnDoneCallback      = std::function<void(void)>;
 
 class DLL_EXPORT ClusterBase
 {
 public:
+    ClusterBase(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        mExchangeManager(exchangeManager), mSession(session), mEndpoint(endpoint)
+    {}
+
     virtual ~ClusterBase() {}
 
     // Temporary function to set command timeout before we move over to InvokeCommand
@@ -67,8 +72,6 @@ public:
      * empty optional if no timeout has been set.
      */
     Optional<System::Clock::Timeout> GetCommandTimeout() { return mTimeout; }
-
-    ClusterId GetClusterId() const { return mClusterId; }
 
     /*
      * This function permits sending an invoke request using cluster objects that represent the request and response data payloads.
@@ -262,12 +265,13 @@ public:
                        ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                        SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
                        ResubscriptionAttemptCallback resubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
-                       bool aKeepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional)
+                       bool aKeepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional,
+                       SubscriptionOnDoneCallback subscriptionDoneCb = nullptr)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
             context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
             maxIntervalCeilingSeconds, subscriptionEstablishedCb, resubscriptionAttemptCb, aIsFabricFiltered,
-            aKeepPreviousSubscriptions, aDataVersion);
+            aKeepPreviousSubscriptions, aDataVersion, subscriptionDoneCb);
     }
 
     template <typename DecodableType, typename DecodableArgType>
@@ -276,8 +280,9 @@ public:
                                   uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                                   SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr,
                                   ResubscriptionAttemptCallback resubscriptionAttemptCb = nullptr, bool aIsFabricFiltered = true,
-                                  bool aKeepPreviousSubscriptions            = false,
-                                  const Optional<DataVersion> & aDataVersion = NullOptional)
+                                  bool aKeepPreviousSubscriptions               = false,
+                                  const Optional<DataVersion> & aDataVersion    = NullOptional,
+                                  SubscriptionOnDoneCallback subscriptionDoneCb = nullptr)
     {
         auto onReportCb = [context, reportCb](const app::ConcreteAttributePath & aPath, const DecodableType & aData) {
             if (reportCb != nullptr)
@@ -293,10 +298,11 @@ public:
             }
         };
 
-        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient) {
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient,
+                                                                                SubscriptionId subscriptionId) {
             if (subscriptionEstablishedCb != nullptr)
             {
-                subscriptionEstablishedCb(context);
+                subscriptionEstablishedCb(context, subscriptionId);
             }
         };
 
@@ -311,7 +317,7 @@ public:
         return Controller::SubscribeAttribute<DecodableType>(
             &mExchangeManager, mSession.Get().Value(), mEndpoint, clusterId, attributeId, onReportCb, onFailureCb,
             minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
-            aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion);
+            aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion, subscriptionDoneCb);
     }
 
     /**
@@ -372,10 +378,11 @@ public:
             }
         };
 
-        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient) {
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb](const app::ReadClient & readClient,
+                                                                                SubscriptionId subscriptionId) {
             if (subscriptionEstablishedCb != nullptr)
             {
-                subscriptionEstablishedCb(context);
+                subscriptionEstablishedCb(context, subscriptionId);
             }
         };
 
@@ -394,12 +401,6 @@ public:
     }
 
 protected:
-    ClusterBase(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, ClusterId cluster,
-                EndpointId endpoint) :
-        mExchangeManager(exchangeManager),
-        mSession(session), mClusterId(cluster), mEndpoint(endpoint)
-    {}
-
     Messaging::ExchangeManager & mExchangeManager;
 
     // Since cluster object is ephemeral, the session shall be valid during the entire lifespan, so we do not need to check the
@@ -407,7 +408,6 @@ protected:
     // can't use SessionHandle here, in such case, the cluster object must be freed when the session is released.
     SessionHolder mSession;
 
-    const ClusterId mClusterId;
     EndpointId mEndpoint;
     Optional<System::Clock::Timeout> mTimeout;
 };

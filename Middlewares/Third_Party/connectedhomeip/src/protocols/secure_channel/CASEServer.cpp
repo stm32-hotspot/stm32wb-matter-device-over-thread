@@ -73,7 +73,14 @@ CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
 CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
-    ChipLogProgress(Inet, "CASE Server received Sigma1 message. Starting handshake. EC %p", ec);
+    if (!ec->GetSessionHandle()->IsUnauthenticatedSession())
+    {
+        ChipLogError(Inet, "CASE Server received Sigma1 message %s EC %p", "over encrypted session. Ignoring.", ec);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    ChipLogProgress(Inet, "CASE Server received Sigma1 message %s EC %p", ". Starting handshake.", ec);
+
     CHIP_ERROR err = InitCASEHandshake(ec);
     SuccessOrExit(err);
 
@@ -86,11 +93,8 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     SuccessOrExit(err);
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        PrepareForSessionEstablishment();
-    }
-
+    // CASESession::OnMessageReceived guarantees that it will call
+    // OnSessionEstablishmentError if it returns error, so nothing else to do here.
     return err;
 }
 
@@ -157,16 +161,7 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
 
-    //
-    // We're not allowed to call methods that will eventually result in calling SessionManager::AllocateSecureSession
-    // from a SessionDelegate::OnSessionReleased callback. Schedule the preparation as an async work item.
-    //
-    mSessionManager->SystemLayer()->ScheduleWork(
-        [](auto * systemLayer, auto * appState) -> void {
-            CASEServer * _this = static_cast<CASEServer *>(appState);
-            _this->PrepareForSessionEstablishment();
-        },
-        this);
+    PrepareForSessionEstablishment();
 }
 
 void CASEServer::OnSessionEstablished(const SessionHandle & session)

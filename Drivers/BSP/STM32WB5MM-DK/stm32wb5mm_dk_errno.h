@@ -47,4 +47,5 @@
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* STM32WB5MM_DK_ERRNO_H */

@@ -35,7 +35,7 @@ public:
 
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override
     {
-        constexpr uint16_t kDefaultTestDiscriminator = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+        constexpr uint16_t kDefaultTestDiscriminator = 3840;
         setupDiscriminator                           = kDefaultTestDiscriminator;
         return CHIP_NO_ERROR;
     }
@@ -91,7 +91,7 @@ public:
 
     CHIP_ERROR GetSetupPasscode(uint32_t & setupPasscode) override
     {
-        constexpr uint32_t kDefaultTestPasscode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
+        constexpr uint32_t kDefaultTestPasscode = 20202021;
         setupPasscode                           = kDefaultTestPasscode;
         return CHIP_NO_ERROR;
     }

@@ -109,17 +109,10 @@ __WEAK void MOTENV_STM_Init( void )
 {
   return;
 }
-__WEAK void MATTER_STM_Init( void )
-{
-  return;
-}
-
 __WEAK void P2PS_STM_Init( void )
 {
   return;
 }
-
-
 __WEAK void ZDD_STM_Init( void )
 {
   return;
@@ -186,10 +179,8 @@ __WEAK void SVCCTL_SvcInit(void)
 
   MOTENV_STM_Init();
 
-  MATTER_STM_Init();
-  
   P2PS_STM_Init();
-  
+
   ZDD_STM_Init();
 
   OTAS_STM_Init();

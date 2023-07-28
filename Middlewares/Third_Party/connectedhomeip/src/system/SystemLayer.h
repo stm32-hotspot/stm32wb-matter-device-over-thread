@@ -96,7 +96,8 @@ public:
 
     /**
      * @brief
-     *   This method starts a one-shot timer.
+     *   This method starts a one-shot timer.  This method must be called while in the Matter context (from
+     *   the Matter event loop, or while holding the Matter stack lock).
      *
      *   @note
      *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
@@ -114,16 +115,13 @@ public:
     virtual CHIP_ERROR StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
 
     /**
-     * @brief
-     *   This method cancels a one-shot timer, started earlier through @p StartTimer().
+     * @brief This method cancels a one-shot timer, started earlier through @p StartTimer().  This method must
+     *        be called while in the Matter context (from the Matter event loop, or while holding the Matter
+     *        stack lock).
      *
      *   @note
-     *       The cancellation could fail silently in two different ways. If the timer specified by the combination of the callback
-     *       function and application state object couldn't be found, cancellation could fail. If the timer has fired, then
-     *       an event is queued and will be processed later.
-     *
-     *   WARNING: Timer handlers MUST assume that they may be hit even after CancelTimer due to cancelling an
-     *            already fired timer that is queued in the event loop already.
+     *       The cancellation could fail silently if the timer specified by the combination of the callback
+     *       function and application state object couldn't be found.
      *
      *   @param[in]  aOnComplete   A pointer to the callback function used in calling @p StartTimer().
      *   @param[in]  aAppState     A pointer to the application state object used in calling @p StartTimer().
@@ -133,7 +131,9 @@ public:
 
     /**
      * @brief
-     *   Schedules a function with a signature identical to `OnCompleteFunct` to be run as soon as possible in the CHIP context.
+     *   Schedules a function with a signature identical to `OnCompleteFunct` to be run as soon as possible in the Matter context.
+     *   This must only be called when already in the Matter context (from the Matter event loop, or while holding the Matter
+     *   stack lock).
      *
      * @param[in] aComplete     A pointer to a callback function to be called when this timer fires.
      * @param[in] aAppState     A pointer to an application state object to be passed to the callback function as argument.

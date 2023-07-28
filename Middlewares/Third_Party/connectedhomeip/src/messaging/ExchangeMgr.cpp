@@ -219,10 +219,10 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // Legend that can be used to decode this log line can be found in README.md
     //
     ChipLogProgress(ExchangeManager,
-                    ">>> [E:" ChipLogFormatExchangeId " M:" ChipLogFormatMessageCounter "%s] (%s) Msg RX from %u:" ChipLogFormatX64
-                    " [%04X] --- Type %04x:%02x (%s:%s)",
-                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), packetHeader.GetMessageCounter(), ackBuf,
-                    Transport::GetSessionTypeString(session), session->GetFabricIndex(),
+                    ">>> [E:" ChipLogFormatExchangeId " S:%u M:" ChipLogFormatMessageCounter
+                    "%s] (%s) Msg RX from %u:" ChipLogFormatX64 " [%04X] --- Type %04x:%02x (%s:%s)",
+                    ChipLogValueExchangeIdFromReceivedHeader(payloadHeader), session->SessionIdForLogging(),
+                    packetHeader.GetMessageCounter(), ackBuf, Transport::GetSessionTypeString(session), session->GetFabricIndex(),
                     ChipLogValueX64(session->GetPeer().GetNodeId()), static_cast<uint16_t>(compressedFabricId),
                     payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType(), protocolName, msgTypeName);
 #endif
@@ -358,7 +358,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 
     SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
-    return;
 }
 
 void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -394,7 +393,6 @@ void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeade
     }
 
     // The exchange should be closed inside HandleMessage function. So don't bother close it here.
-    return;
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)

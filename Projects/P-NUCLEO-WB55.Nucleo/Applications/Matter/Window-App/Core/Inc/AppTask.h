@@ -39,7 +39,7 @@ public:
 	    static void AppTaskMain(void * pvParameter);
 	    void PostEvent(const AppEvent * event);
 	    void UpdateClusterState();
-	    void InitMatter(void);
+	    CHIP_ERROR InitMatter(void);
 	    static void ButtonEventHandler(Push_Button_st *Button);
 
 protected:

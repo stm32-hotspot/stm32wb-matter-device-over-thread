@@ -104,8 +104,6 @@ public:
      *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this SendMessage API.
-     *  @retval  #CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE if there is a mismatch in the specific send operation and the
-     *                                                       CHIP message protocol version that is supported.
      *  @retval  #CHIP_ERROR_NOT_CONNECTED                  if the context was associated with a connection that is now
      *                                                       closed.
      *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
@@ -183,6 +181,10 @@ public:
     // Set the response timeout for the exchange context, regardless of the underlying session type. Using
     // UseSuggestedResponseTimeout to set a timeout based on the type of the session and the application processing time instead of
     // using this function is recommended.
+    //
+    // If a timeout of 0 is provided, it implies no response is expected. Consequently, ExchangeDelegate::OnResponseTimeout will not
+    // be called.
+    //
     void SetResponseTimeout(Timeout timeout);
 
     // This API is used by commands that need to shut down all existing

@@ -16,7 +16,6 @@
  */
 
 #include <lib/support/TimeUtils.h>
-#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace System {

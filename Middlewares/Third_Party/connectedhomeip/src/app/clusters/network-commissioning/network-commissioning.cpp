@@ -26,6 +26,7 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/SortUtils.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
@@ -528,36 +529,78 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     TLV::TLVWriter * writer;
     TLV::TLVType listContainerType;
     ThreadScanResponse scanResponse;
-    size_t networksEncoded = 0;
+    chip::Platform::ScopedMemoryBuffer<ThreadScanResponse> scanResponseArray;
+    size_t scanResponseArrayLength = 0;
     uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
     SuccessOrExit(err = commandHandle->PrepareCommand(
                       ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(
-        err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)), status));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
     if (debugText.size() != 0)
     {
-        SuccessOrExit(err = DataModel::Encode(
-                          *writer, TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kDebugText)), debugText));
+        SuccessOrExit(
+            err = DataModel::Encode(*writer, TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kDebugText), debugText));
     }
-    SuccessOrExit(
-        err = writer->StartContainer(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kThreadScanResults)),
-                                     TLV::TLVType::kTLVType_Array, listContainerType));
+    SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kThreadScanResults),
+                                               TLV::TLVType::kTLVType_Array, listContainerType));
 
-    for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
+    VerifyOrExit(scanResponseArray.Alloc(chip::min(networks->Count(), kMaxNetworksInScanResponse)), err = CHIP_ERROR_NO_MEMORY);
+    for (; networks != nullptr && networks->Next(scanResponse);)
+    {
+        if ((scanResponseArrayLength == kMaxNetworksInScanResponse) &&
+            (scanResponseArray[scanResponseArrayLength - 1].rssi > scanResponse.rssi))
+        {
+            continue;
+        }
+
+        bool isDuplicated = false;
+
+        for (size_t i = 0; i < scanResponseArrayLength; i++)
+        {
+            if ((scanResponseArray[i].panId == scanResponse.panId) &&
+                (scanResponseArray[i].extendedPanId == scanResponse.extendedPanId))
+            {
+                if (scanResponseArray[i].rssi < scanResponse.rssi)
+                {
+                    scanResponseArray[i] = scanResponseArray[--scanResponseArrayLength];
+                }
+                else
+                {
+                    isDuplicated = true;
+                }
+                break;
+            }
+        }
+
+        if (isDuplicated)
+        {
+            continue;
+        }
+
+        if (scanResponseArrayLength < kMaxNetworksInScanResponse)
+        {
+            scanResponseArrayLength++;
+        }
+        scanResponseArray[scanResponseArrayLength - 1] = scanResponse;
+        Sorting::InsertionSort(scanResponseArray.Get(), scanResponseArrayLength,
+                               [](const ThreadScanResponse & a, const ThreadScanResponse & b) -> bool { return a.rssi > b.rssi; });
+    }
+
+    for (size_t i = 0; i < scanResponseArrayLength; i++)
     {
         Structs::ThreadInterfaceScanResult::Type result;
-        Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponse.extendedAddress);
-        result.panId           = scanResponse.panId;
-        result.extendedPanId   = scanResponse.extendedPanId;
-        result.networkName     = CharSpan(scanResponse.networkName, scanResponse.networkNameLen);
-        result.channel         = scanResponse.channel;
-        result.version         = scanResponse.version;
+        Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponseArray[i].extendedAddress);
+        result.panId           = scanResponseArray[i].panId;
+        result.extendedPanId   = scanResponseArray[i].extendedPanId;
+        result.networkName     = CharSpan(scanResponseArray[i].networkName, scanResponseArray[i].networkNameLen);
+        result.channel         = scanResponseArray[i].channel;
+        result.version         = scanResponseArray[i].version;
         result.extendedAddress = ByteSpan(extendedAddressBuffer);
-        result.rssi            = scanResponse.rssi;
-        result.lqi             = scanResponse.lqi;
+        result.rssi            = scanResponseArray[i].rssi;
+        result.lqi             = scanResponseArray[i].lqi;
+
         SuccessOrExit(err = DataModel::Encode(*writer, TLV::AnonymousTag(), result));
     }
 
@@ -601,16 +644,14 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
                       ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    SuccessOrExit(
-        err = writer->Put(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kNetworkingStatus)), status));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
     if (debugText.size() != 0)
     {
-        SuccessOrExit(err = DataModel::Encode(
-                          *writer, TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kDebugText)), debugText));
+        SuccessOrExit(
+            err = DataModel::Encode(*writer, TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kDebugText), debugText));
     }
-    SuccessOrExit(
-        err = writer->StartContainer(TLV::ContextTag(to_underlying(Commands::ScanNetworksResponse::Fields::kWiFiScanResults)),
-                                     TLV::TLVType::kTLVType_Array, listContainerType));
+    SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kWiFiScanResults),
+                                               TLV::TLVType::kTLVType_Array, listContainerType));
 
     for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
     {
@@ -757,46 +798,6 @@ DeviceLayer::NetworkCommissioning::NetworkIterator * NullNetworkDriver::GetNetwo
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-// These functions are ember interfaces, they should never be implemented since all network commissioning cluster functions are
-// implemented in NetworkCommissioning::Instance.
-bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::AddOrUpdateThreadNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::AddOrUpdateWiFiNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterConnectNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::ConnectNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                             const Commands::RemoveNetwork::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                            const Commands::ScanNetworks::DecodableType & commandData)
-{
-    return false;
-}
-
-bool emberAfNetworkCommissioningClusterReorderNetworkCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                              const Commands::ReorderNetwork::DecodableType & commandData)
-{
-    return false;
-}
 
 void MatterNetworkCommissioningPluginServerInitCallback()
 {

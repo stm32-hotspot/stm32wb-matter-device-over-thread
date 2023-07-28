@@ -38,6 +38,7 @@ class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 public:
     // Members that implement both ServiceAdveriser and Resolver interfaces.
     CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> *) override { return InitImpl(); }
+    bool IsInitialized() override;
     void Shutdown() override;
 
     // Members that implement ServiceAdvertiser interface.
@@ -54,13 +55,23 @@ public:
     {
         mResolverProxy.SetCommissioningDelegate(delegate);
     }
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR StopDiscovery() override;
+    CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
     static DiscoveryImplPlatform & GetInstance();
 
 private:
+    enum class State : uint8_t
+    {
+        kUninitialized,
+        kInitializing,
+        kInitialized
+    };
+
     DiscoveryImplPlatform();
 
     DiscoveryImplPlatform(const DiscoveryImplPlatform &) = delete;
@@ -80,16 +91,8 @@ private:
                               size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                               DnssdServiceProtocol procotol, PeerId peerId);
 
-    OperationalAdvertisingParameters mOperationalNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionerNodeAdvertisingParams;
-    bool mIsOperationalNodePublishing    = false;
-    bool mIsCommissionableNodePublishing = false;
-    bool mIsCommissionerNodePublishing   = false;
+    State mState = State::kUninitialized;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
-
-    bool mDnssdInitialized = false;
-
     ResolverProxy mResolverProxy;
 
     static DiscoveryImplPlatform sManager;

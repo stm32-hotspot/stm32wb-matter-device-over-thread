@@ -1,0 +1,119 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Channel Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Channel"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Read attribute Channel list"
+      command: "readAttribute"
+      attribute: "ChannelList"
+      response:
+          value:
+              [
+                  {
+                      MajorNumber: 6,
+                      MinorNumber: 0,
+                      Name: "ABC",
+                      CallSign: "KAAL-TV",
+                      AffiliateCallSign: "KAAL",
+                  },
+                  {
+                      MajorNumber: 9,
+                      MinorNumber: 1,
+                      Name: "PBS",
+                      CallSign: "KCTS-TV",
+                      AffiliateCallSign: "KCTS",
+                  },
+                  {
+                      MajorNumber: 9,
+                      MinorNumber: 2,
+                      Name: "PBS Kids",
+                      CallSign: "KCTS-TV",
+                      AffiliateCallSign: "KCTS",
+                  },
+                  {
+                      MajorNumber: 9,
+                      MinorNumber: 3,
+                      Name: "World Channel",
+                      CallSign: "KCTS-TV",
+                      AffiliateCallSign: "KCTS",
+                  },
+              ]
+
+    - label: "Read attribute channel lineup"
+      command: "readAttribute"
+      attribute: "Lineup"
+      response:
+          value:
+              {
+                  OperatorName: "Comcast",
+                  LineupName: "Comcast King County",
+                  PostalCode: "98052",
+                  LineupInfoType: 0,
+              }
+
+    - label: "Read attribute current channel"
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          value:
+              {
+                  MajorNumber: 6,
+                  MinorNumber: 0,
+                  Name: "ABC",
+                  CallSign: "KAAL-TV",
+                  AffiliateCallSign: "KAAL",
+              }
+
+    - label: "Change Channel Command"
+      command: "ChangeChannel"
+      arguments:
+          values:
+              - name: "Match"
+                value: "PBS"
+      response:
+          values:
+              - name: "Data"
+                value: "data response"
+              - name: "Status"
+                value: 0
+
+    - label: "Change Channel By Number Command"
+      command: "ChangeChannelByNumber"
+      arguments:
+          values:
+              - name: "MajorNumber"
+                value: 6
+              - name: "MinorNumber"
+                value: 0
+
+    - label: "Skip Channel Command"
+      command: "SkipChannel"
+      arguments:
+          values:
+              - name: "Count"
+                value: 1

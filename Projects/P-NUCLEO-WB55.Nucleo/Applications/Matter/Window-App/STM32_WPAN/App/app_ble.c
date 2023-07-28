@@ -229,7 +229,7 @@ uint8_t index_con_int, mutex;
  * Advertising Data
  */
 static const char local_name[] = { AD_TYPE_COMPLETE_LOCAL_NAME, 'S', 'T', 'D', 'K', 'M', 'A', 'T', 'T', 'E', 'R' };
-uint8_t manuf_data[15] = { 0x02, 0x01, 0x06, 0x0B, 0x16, 0xF6, 0xFF, 0x00, 0x00, 0x0A, 0xF1, 0xFF, 0x04, 0x80, 0x00, };
+uint8_t manuf_data[15] = { 0x02, 0x01, 0x06, 0x0B, 0x16, 0xF6, 0xFF, 0x00, 0x00, 0x0F, 0xF1, 0xFF, 0x04, 0x80, 0x00, };
 
 /* USER CODE BEGIN PV */
 
@@ -375,7 +375,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt) {
 	event_pckt = (hci_event_pckt*) ((hci_uart_pckt*) pckt)->data;
 
 	switch (event_pckt->evt) {
-	case EVT_DISCONN_COMPLETE: {
+	case HCI_DISCONNECTION_COMPLETE_EVT_CODE: {
 		hci_disconnection_complete_event_rp0 *disconnection_complete_event;
 		disconnection_complete_event = (hci_disconnection_complete_event_rp0*) event_pckt->data;
 
@@ -389,7 +389,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt) {
 		 */
 		handleNotification.P2P_Evt_Opcode = MATTER_STM_PEER_DISCON_HANDLE_EVT;
 		handleNotification.ConnectionHandle = disconnection_complete_event->Connection_Handle;
-		MATTER_APP_Notification(&handleNotification);
+		APP_MATTER_Notification(&handleNotification);
 
 		/* USER CODE BEGIN EVT_DISCONN_COMPLETE */
 
@@ -398,20 +398,20 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt) {
 
 		break; /* EVT_DISCONN_COMPLETE */
 
-	case EVT_LE_META_EVENT: {
+	case HCI_LE_META_EVT_CODE: {
 		meta_evt = (evt_le_meta_event*) event_pckt->data;
 		/* USER CODE BEGIN EVT_LE_META_EVENT */
 
 		/* USER CODE END EVT_LE_META_EVENT */
 		switch (meta_evt->subevent) {
-		case EVT_LE_CONN_UPDATE_COMPLETE:
+		case HCI_LE_CONNECTION_UPDATE_COMPLETE_SUBEVT_CODE:
 			APP_DBG_MSG("\r\n\r** CONNECTION UPDATE EVENT WITH CLIENT \n");
 
 			/**
 			 * The connection is done, there is no need anymore to schedule the LP ADV
 			 */
 			break;
-		case EVT_LE_CONN_COMPLETE: {
+		case HCI_LE_CONNECTION_COMPLETE_SUBEVT_CODE: {
 			hci_le_connection_complete_event_rp0 *connection_complete_event;
 
 			/**
@@ -437,7 +437,7 @@ SVCCTL_UserEvtFlowStatus_t SVCCTL_App_Notification(void *pckt) {
 			hci_le_set_data_length(BleApplicationContext.BleApplicationContext_legacy.connectionHandle, 251, 2120);
 			handleNotification.P2P_Evt_Opcode = MATTER_STM_PEER_CONN_HANDLE_EVT;
 			handleNotification.ConnectionHandle = BleApplicationContext.BleApplicationContext_legacy.connectionHandle;
-			MATTER_APP_Notification(&handleNotification);
+			APP_MATTER_Notification(&handleNotification);
 			/**/
 			/* USER CODE END HCI_EVT_LE_CONN_COMPLETE */
 		}
@@ -658,7 +658,7 @@ void APP_BLE_Adv_Request(APP_BLE_ConnStatus_t New_Status) {
 	/* Start Fast or Low Power Advertising */
 	ret = aci_gap_set_discoverable(
 	ADV_IND, Min_Inter, Max_Inter,
-	PUBLIC_ADDR,
+	GAP_PUBLIC_ADDR,
 	NO_WHITE_LIST_USE, /* use white list */
 	sizeof(local_name), (uint8_t*) &local_name, BleApplicationContext.BleApplicationContext_legacy.advtServUUIDlen,
 			BleApplicationContext.BleApplicationContext_legacy.advtServUUID, 0, 0);

@@ -18,7 +18,7 @@
   ******************************************************************************
   @endverbatim
 
-### 09-Feb-2023 ###
+### 20-Jul-2023 ###
 ========================
 
 STM32WB-Matter-BLE-Thread example is based on Matter and behaves as a Matter accessory communicating over a 802.15.4 Thread network.
@@ -33,7 +33,7 @@ COAP,THREAD,BLE,Matter
 @par Directory contents 
 
  
-  Using Matter v1.0.0 SDK.
+  Using Matter v1.1.0 SDK.
   
 
   - Matter/Lighting-App/STM32_WPAN/App/app_ble.h            Header for app_ble.c module
@@ -138,14 +138,16 @@ The Peripheral device (P2P Server) starts a fast advertising after reset for 30 
 After reset, OpenThread is started and nodes tries to build up a Thread network or attach to a existing one
 
 
-**** BUTTON/LED SUMMARY ****
+**** LED SUMMARY ****
 LED Mapping :
 - LED 1 Blue  : ON when the STM32WB55xx-Nucleo board is paired via BLE to an Android Smartphone, OFF otherwise.
 - LED 2 Green : ON when the STM32WB55xx-Nucleo board is connected to a Thread network, OFF otherwise.
-- LED 3 Red   : Proceed the ON/OFF cluster request from the Android CHIPTool application 
+- LED 3 Red   : Proceed the ON/OFF cluster request from the Android CHIPTool application .
 
-Button Mapping :
-- SW1 1 : Press the button for at least 10 seconds to do a factory reset
+****  BUTTON SUMMARY ****
+Button Mapping:
+- SW1 1 : Press the button for at least 10 seconds to do a factory reset.
+          Push the button the save the non-volatile memory after unpairing the device then power off the board.
 
 
 Coprocessor firmware:
