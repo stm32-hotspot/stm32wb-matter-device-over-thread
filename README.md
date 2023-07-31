@@ -1,5 +1,6 @@
 # STM32WB Matter Device Over Thread MCU Firmware Package
 
+![latest tag](https://img.shields.io/github/v/tag/stm32-hotspot/stm32wb-matter-device-over-thread.svg?color=brightgreen)
 
 ## Overview
 
@@ -19,6 +20,10 @@ This Hotspot FW package includes:
 
 MATTER, CHIP, Connectedhomeip, IoT, Internet of Things, Network, Connectivity, FreeRTOS, LwIP, commissioning, CSA, Connectivity Standard Alliance,
 STM32 , P-NUCLEO-WB55 , STM32WB5MM-DK, OpenThread, BLE. 
+
+## Release note
+
+Details about the content of this release are available in the release note [here](https://htmlpreview.github.io/?https://github.com/stm32-hotspot/stm32wb-matter-device-over-thread/blob/main/Release_Notes.html).
 
 ## Boards Needed
   * as Matter accessory P-NUCLEO-WB55 or STM32WB5MM-DK
