@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * File Name          : freertos_port.c
-  * Description        : Custom porting of FreeRTOS functionalities
-  *
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2019-2021 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File Name          : freertos_port.c
+ * Description        : Custom porting of FreeRTOS functionalities
+ *
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2019-2021 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -27,10 +27,9 @@
 #include <limits.h>
 
 /* Private typedef -----------------------------------------------------------*/
-typedef struct
-{
-  uint32_t LpTimeLeftOnEntry;
-  uint8_t LpTimerFreeRTOS_Id;
+typedef struct {
+    uint32_t LpTimeLeftOnEntry;
+    uint8_t LpTimerFreeRTOS_Id;
 } LpTimerContext_t;
 
 /* Private defines -----------------------------------------------------------*/
@@ -84,9 +83,8 @@ void vPortSetupTimerInterrupt( void );
  * @param: xExpectedIdleTime is given in number of FreeRTOS Ticks
  * @retval: None
  */
-void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime )
-{
-  /* If low power is not used, do not stop the SysTick and continue execution */
+void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime) {
+    /* If low power is not used, do not stop the SysTick and continue execution */
 #if ( CFG_LPM_SUPPORTED != 0)
   /**
    * Although this is not documented as such, when xExpectedIdleTime = 0xFFFFFFFF = (~0),

@@ -39,9 +39,7 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <platform/TestOnlyCommissionableDataProvider.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <inet/EndPointStateOpenThread.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -63,7 +61,7 @@ using namespace ::chip::app::Clusters;
 using chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr;
 
 AppTask AppTask::sAppTask;
-chip::DeviceLayer::TestOnlyCommissionableDataProvider gTestOnlyCommissionableDataProvider;
+chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
 #define  APP_FUNCTION_BUTTON BUTTON_USER1
 #define STM32ThreadDataSet "STM32DataSet"
@@ -145,12 +143,14 @@ CHIP_ERROR AppTask::Init() {
 	chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
 #endif
 
-	SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
 	// Init ZCL Data Model
 	static chip::CommonCaseDeviceServerInitParams initParams;
 	(void) initParams.InitializeStaticResourcesBeforeServerInit();
-	chip::DeviceLayer::SetCommissionableDataProvider(
-			&gTestOnlyCommissionableDataProvider);
+	ReturnErrorOnFailure(mFactoryDataProvider.Init());
+	SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+	SetCommissionableDataProvider(&mFactoryDataProvider);
+	SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
 
 	chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
 	nativeParams.lockCb = LockOpenThreadTask;

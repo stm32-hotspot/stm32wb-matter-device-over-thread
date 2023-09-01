@@ -41,6 +41,7 @@ typedef enum
 	NVM_BLOCK_SIZE_OVERFLOW,
 	NVM_ERROR_BLOCK_ALIGN,
 	NVM_FLASH_CORRUPTION,
+	NVM_PARAM_ERROR,
 	NVM_BUFFER_TOO_SMALL
 }NVM_StatusTypeDef;
 
@@ -108,10 +109,15 @@ NVM_StatusTypeDef NM_DeleteKey(const char *Keyname,NVM_Sector sector );
 
 
 /**
+  * @brief  Get the address of the OT NVM buffer
+  * @param  Addr: return the Address of the OT buffer
+  * @retval return state of function
+  */
+NVM_StatusTypeDef NM_GetOtNVMAddr(uint32_t* NVMAddr);
+
+/**
   * @brief  Erase all persistent and reboot program
   */
-
-
 void NM_ResetFactory(void);
 void NM_FullErase(void);
 

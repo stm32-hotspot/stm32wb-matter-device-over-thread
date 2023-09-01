@@ -3458,36 +3458,6 @@
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/credentials/attestation_verifier/FileAttestationTrustStore.h</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/connectedhomeip/src/credentials/examples/DeviceAttestationCredsExample.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/credentials/examples/DeviceAttestationCredsExample.cpp</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/credentials/examples/DeviceAttestationCredsExample.h</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/credentials/examples/DeviceAttestationCredsExample.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/credentials/examples/ExampleDACs.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/credentials/examples/ExampleDACs.cpp</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/credentials/examples/ExampleDACs.h</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/credentials/examples/ExampleDACs.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/credentials/examples/ExamplePAI.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/credentials/examples/ExamplePAI.cpp</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/credentials/examples/ExamplePAI.h</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/credentials/examples/ExamplePAI.h</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/connectedhomeip/src/credentials/examples/LastKnownGoodTimeCertificateValidityPolicyExample.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/credentials/examples/LastKnownGoodTimeCertificateValidityPolicyExample.h</locationURI>
@@ -3611,11 +3581,6 @@
 			<name>Middlewares/connectedhomeip/src/include/platform/PlatformManager.h</name>
 			<type>1</type>
 			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/include/platform/PlatformManager.h</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/connectedhomeip/src/include/platform/TestOnlyCommissionableDataProvider.h</name>
-			<type>1</type>
-			<locationURI>PARENT-6-PROJECT_LOC/Middlewares/Third_Party/connectedhomeip/src/include/platform/TestOnlyCommissionableDataProvider.h</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/connectedhomeip/src/include/platform/ThreadStackManager.h</name>

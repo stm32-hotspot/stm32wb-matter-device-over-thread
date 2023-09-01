@@ -21,6 +21,11 @@
 #ifndef STM_LOGGING_H_
 #define STM_LOGGING_H_
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #define LOG_LEVEL_NONE  0  /* None     */
 #define LOG_LEVEL_CRIT  1U  /* Critical */
 #define LOG_LEVEL_WARN  2U  /* Warning  */
@@ -63,5 +68,8 @@ typedef uint8_t appliLogLevel_t;
 
 void logApplication(appliLogLevel_t aLogLevel, appliLogRegion_t aLogRegion, const char *aFormat, ...);
 
+#ifdef __cplusplus
+}
+#endif
 #endif  /* STM_LOGGING_H_ */
 

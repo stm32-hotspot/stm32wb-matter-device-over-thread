@@ -347,6 +347,10 @@ static void APPE_SysEvtReadyProcessing(void) {
 	/* Traces channel initialization */
 	TL_TRACES_Init();
 
+	/* Configuration to CPU2 */
+	SHCI_C2_CONFIG_Cmd_Param_t config_param = {0};
+	uint32_t Ot_NVMAddr = 0;
+
 	/* In the Context of Dynamic Concurrent mode, the Init and start of each stack must be split and executed
 	 * in the following order :
 	 * APP_BLE_Init    : BLE Stack Init until it's ready to start ADV
@@ -354,7 +358,15 @@ static void APPE_SysEvtReadyProcessing(void) {
 	 */
 	APP_DBG("1- Initialisation of BLE Stack...");
 	APP_BLE_Init_Dyn_1();
+
+	/* Set the address that will be used by OT stack for NVM data management */
+	if(NM_GetOtNVMAddr(&Ot_NVMAddr) == NVM_OK){
+		config_param.ThreadNvmRamAddress = Ot_NVMAddr;
+		(void)SHCI_C2_Config(&config_param);
+	}
+
 	APP_DBG("2- Initialisation of OpenThread Stack. FW info :");
+
 	APP_THREAD_Init();
 	APP_BLE_Init_Dyn_2();
 

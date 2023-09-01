@@ -31,7 +31,7 @@ class FactoryDataProvider : public chip::Credentials::DeviceAttestationCredentia
 {
 public:
     CHIP_ERROR Init();
-
+    static FactoryDataProvider & GetDefaultInstance();
     // ===== Members functions that implement the DeviceAttestationCredentialsProvider
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;

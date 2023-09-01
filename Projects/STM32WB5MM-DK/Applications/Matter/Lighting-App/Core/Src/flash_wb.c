@@ -50,7 +50,6 @@ typedef struct{
 
 } NVM_Sector_Struct;
 
-
 /* Private macros ------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
@@ -78,7 +77,7 @@ static uint8_t flash_get(uint8_t *KeyValue, uint8_t *KeyAddr, size_t KeySize,siz
 static uint8_t flash_update(const NVM_Sector_Struct select_sector, uint8_t *KeyName,uint8_t *KeyValue, size_t KeySize);
 static NVM_StatusTypeDef flash_replace (const NVM_Sector_Struct select_sector ,uint8_t *PtKeyfind, uint8_t *KeyName,uint8_t *KeyValue, size_t KeySize);
 static NVM_StatusTypeDef flash_write (uint8_t *PtKeyFree, uint8_t *key,uint8_t *value, size_t value_size);
-static uint8_t* SearchKey(uint8_t *PtPage, uint8_t *KeyName);
+static uint8_t* SearchKey(uint8_t *PtPage, uint8_t *KeyName, size_t nvm_size);
 static NVM_StatusTypeDef delete_key(const NVM_Sector_Struct select_sector,uint8_t *PtkeyFind);
 
 /* Public functions ----------------------------------------------------------*/
@@ -86,7 +85,7 @@ static NVM_StatusTypeDef delete_key(const NVM_Sector_Struct select_sector,uint8_
 void NM_Init(void) {
 	// Copy Nvm flash to ram, it used one time for boot
 	// copy no secure nvm  to no secure ram
-	memcpy(sector_no_secure.ram_ptr, NVM_MATTER_ADDR_INIT_NOSECURE_PTR,sector_no_secure.sector_size );
+    memcpy(sector_no_secure.ram_ptr, NVM_MATTER_ADDR_INIT_NOSECURE_PTR,sector_no_secure.sector_size );
 
 	// copy secure nvm to secure ram  *SIMULATE TO EXAMPLE*
 	memcpy(sector_secure.ram_ptr, NVM_MATTER_ADDR_INIT_SECURE_PTR,sector_secure.sector_size);
@@ -124,6 +123,10 @@ NVM_StatusTypeDef NM_Dump(void) {
 NVM_StatusTypeDef NM_GetKeyValue(void *KeyValue, const char *KeyName, uint32_t KeySize, size_t *read_by_size,NVM_Sector sector )
 {
 
+    if((KeyValue == NULL) || (read_by_size == NULL))
+    {
+        return NVM_PARAM_ERROR;
+    }
 	NVM_Sector_Struct select_nvm = {0};
 	switch(sector) {
 		case SECTOR_NO_SECURE :
@@ -139,7 +142,7 @@ NVM_StatusTypeDef NM_GetKeyValue(void *KeyValue, const char *KeyName, uint32_t K
 	}
 
 
-	uint8_t *key_search = SearchKey(select_nvm.ram_ptr, (uint8_t*) KeyName);
+	uint8_t *key_search = SearchKey(select_nvm.ram_ptr, (uint8_t*) KeyName, select_nvm.sector_size);
 	if (key_search != NULL) {
 		// copy Keyname's value in KeyValue and copy the size of KeyValue in read_by_size
 		return flash_get(KeyValue, key_search, KeySize, read_by_size);
@@ -147,8 +150,20 @@ NVM_StatusTypeDef NM_GetKeyValue(void *KeyValue, const char *KeyName, uint32_t K
 	return NVM_KEY_NOT_FOUND;
 }
 
+NVM_StatusTypeDef NM_GetOtNVMAddr(uint32_t* NVMAddr){
+	if(NVMAddr == NULL){
+		return NVM_PARAM_ERROR;
+	}
+	*NVMAddr = (uint32_t)ram_nvm + SECTOR_SIZE_SECURE;
+	return NVM_OK;
+}
+
 NVM_StatusTypeDef NM_SetKeyValue(char *KeyValue, char *KeyName, uint32_t KeySize,NVM_Sector sector ) {
 
+    if((KeyValue == NULL) || (KeyName == NULL))
+    {
+        return NVM_PARAM_ERROR;
+    }
 	NVM_Sector_Struct select_nvm = {0};
 	void *Ptkey = NULL;
 
@@ -170,7 +185,7 @@ NVM_StatusTypeDef NM_SetKeyValue(char *KeyValue, char *KeyName, uint32_t KeySize
 		return NVM_BLOCK_SIZE_OVERFLOW;
 	}
 	// call function to search the pointer of key if it exist else return  null
-	Ptkey = SearchKey(select_nvm.ram_ptr, (uint8_t*) KeyName);
+	Ptkey = SearchKey(select_nvm.ram_ptr, (uint8_t*) KeyName, select_nvm.sector_size);
 
 	if (Ptkey == NULL) {
 		return flash_update(select_nvm, (uint8_t*) KeyName, (uint8_t*) KeyValue,KeySize);
@@ -184,6 +199,10 @@ NVM_StatusTypeDef NM_SetKeyValue(char *KeyValue, char *KeyName, uint32_t KeySize
 
 uint8_t NM_DeleteKey(const char *Keyname,NVM_Sector sector ) {
 
+    if(Keyname == NULL)
+    {
+        return NVM_PARAM_ERROR;
+    }
 	NVM_Sector_Struct select_nvm = {0};
 	switch(sector) {
 			case SECTOR_NO_SECURE :
@@ -197,7 +216,7 @@ uint8_t NM_DeleteKey(const char *Keyname,NVM_Sector sector ) {
 			default :
 				return NVM_WRITE_FAILED;
 		}
-	uint8_t *Ptkey = SearchKey(select_nvm.ram_ptr, (uint8_t*) Keyname);
+	uint8_t *Ptkey = SearchKey(select_nvm.ram_ptr, (uint8_t*) Keyname, select_nvm.sector_size);
 	if (Ptkey != NULL) {
 		return delete_key(select_nvm ,Ptkey);
 	}
@@ -218,12 +237,12 @@ void NM_ResetFactory(void) {
  *
  *************************************************************/
 
-static uint8_t* SearchKey(uint8_t *PtPage, uint8_t *KeyName) {
+static uint8_t* SearchKey(uint8_t *PtPage, uint8_t *KeyName, size_t nvm_size) {
 
 	uint8_t *i = PtPage;
 	size_t read_by_size = 0;
 
-	while ((i >= PtPage) || (i < (PtPage + NVM_SIZE_FLASH))) {
+	while ((i >= PtPage) || (i < (PtPage + nvm_size))) {
 		if (*i != DEFAULT_VALUE) {
 			if (strcmp((char*) KeyName, (char*) i) == 0) {
 				return i;
@@ -232,7 +251,7 @@ static uint8_t* SearchKey(uint8_t *PtPage, uint8_t *KeyName) {
 					*(size_t*) ((uint8_t*) i + MATTER_KEY_NAME_MAX_LENGTH);
 			i += read_by_size + sizeof(size_t) + MATTER_KEY_NAME_MAX_LENGTH;
 			//Flash is corrupted
-			if ((i < PtPage) || (i > (PtPage + NVM_SIZE_FLASH))) {
+			if ((i < PtPage) || (i > (PtPage + nvm_size))) {
 				NM_ResetFactory();
 			}
 		} else {
@@ -305,7 +324,7 @@ static NVM_StatusTypeDef delete_key(const NVM_Sector_Struct select_sector,uint8_
 		PtKeyNext = PtkeyFind + size_key + MATTER_KEY_NAME_MAX_LENGTH
 				+ sizeof(size_key);
 		PtKeyCpy = PtkeyFind;
-		while ((*PtKeyNext != 0xFF) && (PtKeyNext < (ram_nvm + NVM_SIZE_FLASH))) {
+		while ((*PtKeyNext != 0xFF) && (PtKeyNext < (select_sector.ram_ptr + select_sector.sector_size))) {
 			size_key = *(size_t*) ((uint8_t*) PtKeyNext
 					+ MATTER_KEY_NAME_MAX_LENGTH);
 			memcpy(PtKeyCpy, PtKeyNext,
@@ -314,7 +333,7 @@ static NVM_StatusTypeDef delete_key(const NVM_Sector_Struct select_sector,uint8_
 			PtKeyNext += size_key + MATTER_KEY_NAME_MAX_LENGTH
 					+ sizeof(size_key);
 		}
-		memset(PtKeyCpy, DEFAULT_VALUE, (ram_nvm + NVM_SIZE_FLASH - PtKeyCpy));
+		memset(PtKeyCpy, DEFAULT_VALUE, (select_sector.ram_ptr + select_sector.sector_size - PtKeyCpy));
 		return NVM_OK;
 	}
 	return NVM_DELETE_FAILED;
